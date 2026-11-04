@@ -1,0 +1,10 @@
+target/
+*.log
+hs_err_*.log
+replay_*.log
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+dependency-reduced-pom.xml
