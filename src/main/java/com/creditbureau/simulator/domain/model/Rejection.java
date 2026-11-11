@@ -9,3 +9,4 @@ public record Rejection(
         String reason
 ) {
 }
+
