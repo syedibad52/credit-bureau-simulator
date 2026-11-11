@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,10 +37,7 @@ public class CsvParser {
             }
 
             String[] headerFields = headerLine.split(DELIMITER, -1);
-            if (headerFields.length != expectedColumns) {
-                logger.warn("Header column count ({}) does not match expected ({}). File: {}",
-                        headerFields.length, expectedColumns, filePath);
-            }
+            int columnCount = expectedColumns > 0 ? expectedColumns : headerFields.length;
 
             String line;
             int lineNumber = 1;
@@ -51,9 +49,9 @@ public class CsvParser {
                 }
 
                 String[] fields = line.split(DELIMITER, -1);
-                if (fields.length != expectedColumns) {
+                if (fields.length != columnCount && expectedColumns > 0 && fields.length != headerFields.length) {
                     errors.add(String.format("Line %d: Expected %d columns but found %d: '%s'",
-                            lineNumber, expectedColumns, fields.length, line));
+                            lineNumber, columnCount, fields.length, line));
                     continue;
                 }
 
@@ -78,22 +76,21 @@ public class CsvParser {
     public List<Path> findFiles(Path directory, String filePrefix) {
         List<Path> result = new ArrayList<>();
         if (!Files.isDirectory(directory)) {
-            logger.warn("Not a directory: {}", directory);
             return result;
         }
 
-        try (var stream = Files.list(directory)) {
-            stream.filter(p -> {
-                        String name = p.getFileName().toString().toLowerCase();
-                        return name.startsWith(filePrefix.toLowerCase()) && name.endsWith(".csv");
-                    })
-                    .sorted()
-                    .forEach(result::add);
+        try (var stream = Files.newDirectoryStream(directory)) {
+            for (Path path : stream) {
+                String fileName = path.getFileName().toString().toLowerCase();
+                if (fileName.startsWith(filePrefix.toLowerCase()) && fileName.endsWith(".csv")) {
+                    result.add(path);
+                }
+            }
         } catch (IOException e) {
-            logger.error("Error listing directory: {}", directory, e);
+            logger.error("Error scanning directory: {}", directory, e);
         }
 
+        Collections.sort(result);
         return result;
     }
 }
-

@@ -10,4 +10,8 @@ public record OverrideResult(
     int capValue,
     boolean applied,
     String reason
-) {}
+) {
+    public boolean isTriggered() {
+        return applied;
+    }
+}

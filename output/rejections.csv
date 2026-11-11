@@ -1,0 +1,3 @@
+source_file,record_id,reason
+tradelines.csv,TL-01155,Invalid account type: CD
+enquiries.csv,ENQ-0040,Duplicate enquiry record

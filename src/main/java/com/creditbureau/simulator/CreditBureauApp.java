@@ -54,6 +54,8 @@ public class CreditBureauApp {
               generate-report     Generate full credit report
               score-history       Show score history for a consumer
               run-all             Run complete pipeline (ingest + score + report)
+              evaluate            Execute commands.txt and output 5 evaluation CSVs
+              serve               Launch embedded Web UI on port 8080
             
             Common Options:
               --data <dir>        Directory containing input CSV files

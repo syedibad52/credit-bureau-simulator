@@ -66,6 +66,7 @@ public class CommandRouter {
             case "score-history" -> handleScoreHistory(commandArgs);
             case "run-all" -> handleRunAll(commandArgs);
             case "serve" -> handleServe(commandArgs);
+            case "evaluate", "run-commands" -> handleEvaluate(commandArgs);
             default -> {
                 System.err.println("Unknown command: " + commandArgs.command());
                 yield 1;
@@ -231,5 +232,25 @@ public class CommandRouter {
             return 1;
         }
         return 0;
+    }
+
+    private int handleEvaluate(CommandArgs args) {
+        Path dataDir = Paths.get(args.dataDir());
+        Path outputDir = Paths.get(args.outputDir());
+        System.out.printf("Running evaluation against %s, writing results to %s...%n", dataDir, outputDir);
+        try {
+            new com.creditbureau.simulator.processing.CommandFileRunner().run(dataDir, outputDir);
+            System.out.println("Evaluation completed successfully. Generated 5 evaluation CSV files:");
+            System.out.println("  1. " + outputDir.resolve("report_summary.csv"));
+            System.out.println("  2. " + outputDir.resolve("report_accounts.csv"));
+            System.out.println("  3. " + outputDir.resolve("dpd_grid.csv"));
+            System.out.println("  4. " + outputDir.resolve("score_history.csv"));
+            System.out.println("  5. " + outputDir.resolve("rejections.csv"));
+            return 0;
+        } catch (Exception e) {
+            System.err.println("Evaluation failed: " + e.getMessage());
+            logger.error("Evaluation error", e);
+            return 1;
+        }
     }
 }

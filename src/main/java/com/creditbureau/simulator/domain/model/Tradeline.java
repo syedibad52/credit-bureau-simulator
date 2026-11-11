@@ -2,34 +2,94 @@ package com.creditbureau.simulator.domain.model;
 
 import com.creditbureau.simulator.domain.enums.AccountStatus;
 import com.creditbureau.simulator.domain.enums.AccountType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 /**
  * Immutable record representing a single monthly tradeline submission from a lender.
- * This is the raw input data before merging.
+ * Supports both the 14-column official PS-022 format and legacy format.
  */
 public record Tradeline(
+    String submissionId,
+    String fileId,
+    LocalDate receivedDate,
+    YearMonth reportMonth,
+    String lenderId,
     String consumerId,
-    String lender,
+    String accountNo,
     AccountType accountType,
     LocalDate openDate,
-    BigDecimal creditLimit,
-    BigDecimal outstandingBalance,
-    int currentDPD,
+    BigDecimal sanctionedAmount,
+    BigDecimal balance,
+    int dpd,
     AccountStatus status,
-    LocalDate submissionDate,
+    LocalDate closedDate,
     int fileOrderIndex
 ) {
     public Tradeline {
         if (consumerId == null || consumerId.isBlank()) throw new IllegalArgumentException("consumerId must not be blank");
-        if (lender == null || lender.isBlank()) throw new IllegalArgumentException("lender must not be blank");
+        if (lenderId == null || lenderId.isBlank()) throw new IllegalArgumentException("lenderId must not be blank");
         if (accountType == null) throw new IllegalArgumentException("accountType must not be null");
         if (openDate == null) throw new IllegalArgumentException("openDate must not be null");
-        if (creditLimit == null) throw new IllegalArgumentException("creditLimit must not be null");
-        if (outstandingBalance == null) throw new IllegalArgumentException("outstandingBalance must not be null");
-        if (currentDPD < 0) throw new IllegalArgumentException("currentDPD must not be negative");
+        if (sanctionedAmount == null) throw new IllegalArgumentException("sanctionedAmount must not be null");
+        if (balance == null) throw new IllegalArgumentException("balance must not be null");
+        if (dpd < 0) throw new IllegalArgumentException("dpd must not be negative");
         if (status == null) throw new IllegalArgumentException("status must not be null");
-        if (submissionDate == null) throw new IllegalArgumentException("submissionDate must not be null");
+        if (receivedDate == null) throw new IllegalArgumentException("receivedDate must not be null");
+    }
+
+    // Backwards-compatible constructor for 9-field legacy format
+    public Tradeline(
+            String consumerId,
+            String lender,
+            AccountType accountType,
+            LocalDate openDate,
+            BigDecimal creditLimit,
+            BigDecimal outstandingBalance,
+            int currentDPD,
+            AccountStatus status,
+            LocalDate submissionDate,
+            int fileOrderIndex
+    ) {
+        this(
+                "TL-LEGACY-" + fileOrderIndex,
+                "TLF-" + YearMonth.from(submissionDate).toString().replace("-", ""),
+                submissionDate,
+                YearMonth.from(submissionDate),
+                lender,
+                consumerId,
+                lender + "-" + accountType + "-" + openDate.toString().replace("-", ""),
+                accountType,
+                openDate,
+                creditLimit,
+                outstandingBalance,
+                currentDPD,
+                status,
+                null,
+                fileOrderIndex
+        );
+    }
+
+    // Compatibility getters
+    public String lender() {
+        return lenderId;
+    }
+
+    public BigDecimal creditLimit() {
+        return sanctionedAmount;
+    }
+
+    public BigDecimal outstandingBalance() {
+        return balance;
+    }
+
+    public int currentDPD() {
+        return dpd;
+    }
+
+    public LocalDate submissionDate() {
+        return receivedDate;
     }
 }

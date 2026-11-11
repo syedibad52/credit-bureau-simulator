@@ -1,6 +1,7 @@
 package com.creditbureau.simulator.scoring;
 
 import com.creditbureau.simulator.domain.model.CreditAccount;
+import com.creditbureau.simulator.domain.model.DPDRecord;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -36,10 +37,17 @@ public class ThinFileChecker {
 
         // BR-05: Fewer than 1 eligible tradeline
         if (eligibleAccounts.isEmpty()) {
-            return ThinFileResult.thin("No eligible credit accounts found (fewer than 1 tradeline)", "BR-05");
+            return ThinFileResult.thin("Thin file: fewer than 1 eligible tradeline", "BR-05");
         }
 
-        // Find oldest account open date among eligible accounts
+        // Count distinct report months across eligible accounts
+        long distinctReportMonths = eligibleAccounts.stream()
+                .flatMap(a -> a.getDpdHistory().stream())
+                .map(DPDRecord::reportingMonth)
+                .distinct()
+                .count();
+
+        // Check oldest account open date
         LocalDate oldestDate = null;
         for (CreditAccount acc : eligibleAccounts) {
             if (oldestDate == null || acc.getOpenDate().isBefore(oldestDate)) {
@@ -47,23 +55,18 @@ public class ThinFileChecker {
             }
         }
 
-        if (oldestDate == null) {
-            return ThinFileResult.thin("No eligible tradelines with valid open date", "BR-05");
+        long calendarMonths = 0;
+        if (oldestDate != null && !oldestDate.isAfter(asOfDate)) {
+            calendarMonths = Period.between(oldestDate, asOfDate).toTotalMonths();
         }
 
-        // BR-04 & BR-06: Check credit history duration in calendar months
-        Period historyPeriod = Period.between(oldestDate, asOfDate);
-        long totalMonths = historyPeriod.toTotalMonths();
+        long effectiveHistoryMonths = Math.max(distinctReportMonths, calendarMonths);
 
         // Exactly 6 months must NOT be classified as thin file (BR-06)
-        if (totalMonths < 6) {
-            return ThinFileResult.thin(
-                    String.format("Credit history duration is %d months (less than required 6 months)", totalMonths),
-                    "BR-04"
-            );
+        if (effectiveHistoryMonths < 6) {
+            return ThinFileResult.thin("Thin file: < 6 months history", "BR-04");
         }
 
         return ThinFileResult.notThin();
     }
 }
-

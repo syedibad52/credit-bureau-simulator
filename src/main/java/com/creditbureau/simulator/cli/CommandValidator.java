@@ -16,7 +16,9 @@ public class CommandValidator {
         "generate-report",
         "score-history",
         "run-all",
-        "serve"
+        "serve",
+        "evaluate",
+        "run-commands"
     );
 
     /**

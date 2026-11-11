@@ -1,0 +1,6 @@
+lender_id,lender_name,lender_type,submission_day
+LND-01,Kaveri Commercial Bank,BANK,5
+LND-02,Sahyadri Urban Co-operative Bank,BANK,6
+LND-03,Nandi Housing & Auto Finance,NBFC,7
+LND-04,Tunga Consumer Finance,NBFC,8
+LND-05,PayKart Later Pvt Ltd,FINTECH,9

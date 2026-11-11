@@ -26,11 +26,26 @@ public record AccountEvent(
         }
     }
 
+    public static AccountEvent disputeRaised(String accountId, String consumerId, LocalDate disputeDate) {
+        return new AccountEvent(consumerId, accountId, EventType.DISPUTE, disputeDate, null, null, "Dispute raised");
+    }
+
+    public static AccountEvent disputeResolvedRemoved(String accountId, String consumerId, LocalDate disputeDate, LocalDate resolutionDate) {
+        return new AccountEvent(consumerId, accountId, EventType.DISPUTE, disputeDate, resolutionDate, DisputeOutcome.REMOVED, "Resolved removed");
+    }
+
+    public static AccountEvent disputeResolvedValid(String accountId, String consumerId, LocalDate disputeDate, LocalDate resolutionDate) {
+        return new AccountEvent(consumerId, accountId, EventType.DISPUTE, disputeDate, resolutionDate, DisputeOutcome.VALID, "Resolved valid");
+    }
+
+    public static AccountEvent override(String accountId, String consumerId, EventType eventType, LocalDate eventDate) {
+        return new AccountEvent(consumerId, accountId, eventType, eventDate, null, null, "Override");
+    }
+
     /** Check if this event represents an active dispute at the given as-of date. */
     public boolean isActiveDisputeAt(LocalDate asOfDate) {
         if (eventType != EventType.DISPUTE) return false;
         if (eventDate.isAfter(asOfDate)) return false;
-        // Active if no resolution date, or resolution is after as-of
         return resolutionDate == null || resolutionDate.isAfter(asOfDate);
     }
 

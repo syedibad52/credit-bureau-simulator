@@ -22,4 +22,32 @@ public record ScoreResult(
     List<OverrideResult> appliedOverrides,
     int finalScore,
     List<String> appliedRuleIds
-) {}
+) {
+    public int rawScore() {
+        return preOverrideScore;
+    }
+
+    public List<OverrideResult> overrides() {
+        return appliedOverrides;
+    }
+
+    public FactorContribution paymentContribution() {
+        return paymentHistory;
+    }
+
+    public FactorContribution utilisationContribution() {
+        return utilisation;
+    }
+
+    public FactorContribution creditAgeContribution() {
+        return creditAge;
+    }
+
+    public FactorContribution creditMixContribution() {
+        return creditMix;
+    }
+
+    public FactorContribution enquiryContribution() {
+        return enquiries;
+    }
+}

@@ -1,0 +1,3 @@
+﻿consumer_id,account_id,event_type,event_date,resolution_date,dispute_outcome,details
+CUST-1005,HDFC-CC-20221101,DISPUTE,2026-05-01,2026-08-01,VALID,Disputed fraudulent charges resolved as valid
+

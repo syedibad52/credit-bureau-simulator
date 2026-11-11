@@ -119,6 +119,11 @@ public class FieldValidator {
         return !errors.isEmpty();
     }
 
+    /** Add a custom error message. */
+    public void addCustomError(String message) {
+        errors.add(String.format("Line %d: %s", lineNumber, message));
+    }
+
     /** Get all collected validation errors. */
     public List<String> getErrors() {
         return errors;

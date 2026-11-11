@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -32,7 +30,7 @@ public class AccountMergingEngine {
      * 4. Credit limit / sanctioned amount differs by <= 5% relative to the larger amount
      */
     public boolean isSameAccount(Tradeline t1, Tradeline t2) {
-        if (!t1.lender().equalsIgnoreCase(t2.lender())) {
+        if (!t1.lenderId().equalsIgnoreCase(t2.lenderId())) {
             return false;
         }
 
@@ -45,8 +43,8 @@ public class AccountMergingEngine {
             return false;
         }
 
-        BigDecimal limit1 = t1.creditLimit();
-        BigDecimal limit2 = t2.creditLimit();
+        BigDecimal limit1 = t1.sanctionedAmount();
+        BigDecimal limit2 = t2.sanctionedAmount();
         if (!isAmountWithinFivePercent(limit1, limit2)) {
             return false;
         }
@@ -67,7 +65,6 @@ public class AccountMergingEngine {
         if (max.compareTo(BigDecimal.ZERO) == 0) {
             return true;
         }
-        // diff * 100 <= max * 5
         return diff.multiply(BigDecimal.valueOf(100)).compareTo(max.multiply(BigDecimal.valueOf(5))) <= 0;
     }
 
@@ -81,12 +78,12 @@ public class AccountMergingEngine {
     public List<CreditAccount> mergeAccounts(List<Tradeline> tradelines, List<AccountEvent> events) {
         List<CreditAccount> mergedAccounts = new ArrayList<>();
 
-        // Sort tradelines deterministically: openDate, then submissionDate, then fileOrderIndex
+        // Sort tradelines deterministically: openDate, then lender, then receivedDate, then submissionId
         List<Tradeline> sorted = tradelines.stream()
                 .sorted(Comparator.comparing(Tradeline::openDate)
-                        .thenComparing(Tradeline::lender, String.CASE_INSENSITIVE_ORDER)
-                        .thenComparing(Tradeline::submissionDate)
-                        .thenComparingInt(Tradeline::fileOrderIndex))
+                        .thenComparing(Tradeline::lenderId, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(Tradeline::receivedDate)
+                        .thenComparing(Tradeline::submissionId))
                 .toList();
 
         for (Tradeline t : sorted) {
@@ -94,7 +91,6 @@ public class AccountMergingEngine {
 
             // Check against existing merged accounts
             for (CreditAccount account : mergedAccounts) {
-                // Compare with the seed tradeline or any constituent tradeline
                 Tradeline seed = account.getMergedTradelines().get(0);
                 if (isSameAccount(t, seed)) {
                     matchedAccount = account;
@@ -103,16 +99,15 @@ public class AccountMergingEngine {
             }
 
             if (matchedAccount == null) {
-                // Create a new CreditAccount
-                String accountId = CreditAccount.generateAccountId(t.lender(), t.accountType(), t.openDate());
+                String mergedAccountId = t.lenderId().toUpperCase() + "-" + t.accountNo();
                 matchedAccount = new CreditAccount(
-                        accountId,
+                        mergedAccountId,
                         t.consumerId(),
-                        t.lender(),
+                        t.lenderId(),
                         t.accountType(),
                         t.openDate(),
-                        t.creditLimit(),
-                        t.outstandingBalance(),
+                        t.sanctionedAmount(),
+                        t.balance(),
                         t.status()
                 );
                 mergedAccounts.add(matchedAccount);
@@ -121,14 +116,15 @@ public class AccountMergingEngine {
             // Merge the tradeline into this account
             matchedAccount.mergeTradeline(t);
 
-            // Record monthly DPD (reporting month = YearMonth of submissionDate)
-            YearMonth reportingMonth = YearMonth.from(t.submissionDate());
-            matchedAccount.addDPDRecord(new DPDRecord(reportingMonth, t.currentDPD(), t.submissionDate()));
+            // Record monthly DPD for report_month
+            matchedAccount.addDPDRecord(new DPDRecord(t.reportMonth(), t.dpd(), t.receivedDate()));
 
             // Update closure date if closed
             if (t.status() == AccountStatus.CLOSED) {
-                if (matchedAccount.getCloseDate() == null || t.submissionDate().isBefore(matchedAccount.getCloseDate())) {
-                    matchedAccount.setCloseDate(t.submissionDate());
+                if (t.closedDate() != null) {
+                    matchedAccount.setCloseDate(t.closedDate());
+                } else if (matchedAccount.getCloseDate() == null) {
+                    matchedAccount.setCloseDate(t.receivedDate());
                 }
             }
         }
@@ -137,14 +133,13 @@ public class AccountMergingEngine {
         if (events != null) {
             for (AccountEvent event : events) {
                 for (CreditAccount account : mergedAccounts) {
-                    // Match by accountId if specified, or by prefix
                     if (event.accountId() != null && !event.accountId().isBlank()) {
-                        if (account.getAccountId().equalsIgnoreCase(event.accountId()) ||
-                            event.accountId().toUpperCase().startsWith(account.getLender().toUpperCase())) {
+                        if (account.getMemberAccountNos().contains(event.accountId()) ||
+                            account.getMergedAccountId().equalsIgnoreCase(event.accountId()) ||
+                            event.accountId().equalsIgnoreCase(account.getAccountId())) {
                             account.addEvent(event);
                         }
                     } else {
-                        // General account event for the consumer, attach to all matching accounts if appropriate
                         account.addEvent(event);
                     }
                 }
@@ -157,4 +152,3 @@ public class AccountMergingEngine {
         return mergedAccounts;
     }
 }
-

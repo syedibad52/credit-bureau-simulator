@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FullWorkflowTest {
 
     private final CommandRouter router = new CommandRouter();
-    private final String sampleDataDir = Paths.get("sample-data").toAbsolutePath().toString();
+    private final String sampleDataDir = Paths.get("test-data").toAbsolutePath().toString();
 
     @Test
     @DisplayName("Run All: CUST-1001 Prime consumer report generation")
