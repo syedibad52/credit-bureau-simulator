@@ -126,7 +126,7 @@ public class WebServer {
     private void handleReport(HttpExchange exchange) throws IOException {
         loadData();
         Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
-        String consumerId = params.getOrDefault("consumer", "CUST-1001");
+        String consumerId = params.getOrDefault("consumer", "CON-001");
         String asOfStr = params.getOrDefault("asOf", "2026-10-31");
         LocalDate asOfDate = LocalDate.parse(asOfStr);
 
@@ -239,7 +239,7 @@ public class WebServer {
     private void handleHistory(HttpExchange exchange) throws IOException {
         loadData();
         Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
-        String consumerId = params.getOrDefault("consumer", "CUST-1001");
+        String consumerId = params.getOrDefault("consumer", "CON-001");
 
         List<Tradeline> rawTradelines = dataStore.getTradelinesForConsumer(consumerId);
         List<Enquiry> rawEnquiries = dataStore.getEnquiriesForConsumer(consumerId);
@@ -536,11 +536,26 @@ public class WebServer {
         <div class="controls">
             <label for="consumerSelect" style="font-size:13px;color:var(--text-secondary);">Consumer:</label>
             <select id="consumerSelect">
-                <option value="CUST-1001">CUST-1001 (Prime Profile)</option>
-                <option value="CUST-1002">CUST-1002 (Delinquent/Override)</option>
-                <option value="CUST-1003">CUST-1003 (Thin File)</option>
-                <option value="CUST-1004">CUST-1004 (Over-Utilised)</option>
-                <option value="CUST-1005">CUST-1005 (Disputed/Valid)</option>
+                <option value="CON-001">CON-001 (1-Yr Age Boundary - EC-02)</option>
+                <option value="CON-002">CON-002 (Dispute & Settlement)</option>
+                <option value="CON-003">CON-003 (Delinquency Month 6 - 650 Cap - EC-04)</option>
+                <option value="CON-004">CON-004 (Utilisation 30.0% - EC-01)</option>
+                <option value="CON-005">CON-005 (Balance Correction & BNPL - EC-05)</option>
+                <option value="CON-006">CON-006 (Delinquency Month 7 - No Cap - EC-04)</option>
+                <option value="CON-007">CON-007 (Settled Account & Limit 0 CC)</option>
+                <option value="CON-008">CON-008 (Written-Off Override 24m)</option>
+                <option value="CON-009">CON-009 (Dispute Removed Retroactive - EC-06)</option>
+                <option value="CON-010">CON-010 (Thin File: 5 Months - EC-07)</option>
+                <option value="CON-011">CON-011 (Raw 1000 Capped at 900 - EC-08)</option>
+                <option value="CON-012">CON-012 (Enquiries 14 Days Apart - EC-03)</option>
+                <option value="CON-013">CON-013 (Thin File: 0 Tradelines - EC-07)</option>
+                <option value="CON-014">CON-014 (Settled & Dispute Removed)</option>
+                <option value="CON-015">CON-015 (Point-in-Time Cutoff & Dispute)</option>
+                <option value="CON-016">CON-016 (Exactly 6 Months - Not Thin - EC-07)</option>
+                <option value="CON-017">CON-017 (Utilisation 100.0% - EC-01)</option>
+                <option value="CON-018">CON-018 (Account Merging Boundary 30d/5%)</option>
+                <option value="CON-019">CON-019 (Suit Filed Override 550 Cap)</option>
+                <option value="CON-020">CON-020 (Dispute Valid Retroactive - EC-06)</option>
             </select>
             <label for="asOfDate" style="font-size:13px;color:var(--text-secondary);">As-Of:</label>
             <input type="date" id="asOfDate" value="2026-10-31">

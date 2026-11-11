@@ -31,11 +31,17 @@ public class DataStore implements DataStoreInterface {
     @Override
     public void storeTradelines(List<Tradeline> newTradelines) {
         tradelines.addAll(newTradelines);
+        for (Tradeline t : newTradelines) {
+            getOrCreateConsumer(t.consumerId());
+        }
     }
 
     @Override
     public void storeEnquiries(List<Enquiry> newEnquiries) {
         enquiries.addAll(newEnquiries);
+        for (Enquiry e : newEnquiries) {
+            getOrCreateConsumer(e.consumerId());
+        }
     }
 
     @Override
