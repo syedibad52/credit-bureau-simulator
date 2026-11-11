@@ -12,8 +12,8 @@ public class ReportFormatter {
     private static final NumberFormat INR_FORMAT = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
 
     public static String formatCurrency(BigDecimal amount) {
-        if (amount == null) return "₹0.00";
-        return INR_FORMAT.format(amount).replace("INR", "₹").trim();
+        if (amount == null) return "\u20B90.00";
+        return INR_FORMAT.format(amount).replace("INR", "\u20B9").trim();
     }
 
     public static String divider(char c, int length) {

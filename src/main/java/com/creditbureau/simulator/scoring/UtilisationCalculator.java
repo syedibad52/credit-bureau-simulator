@@ -93,7 +93,7 @@ public class UtilisationCalculator {
             bandExplanation = "> 100% over-utilisation (0 pts)";
         }
 
-        String explanation = String.format("Balance: ₹%s / Limit: ₹%s = %.2f%% (%s)",
+        String explanation = String.format("Balance: \u20B9%s / Limit: \u20B9%s = %.2f%% (%s)",
                 totalBalance.toPlainString(), totalLimit.toPlainString(),
                 utilisationPct.doubleValue(), bandExplanation);
 

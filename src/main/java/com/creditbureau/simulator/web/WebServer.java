@@ -263,8 +263,11 @@ public class WebServer {
     }
 
     private String formatFactorJson(com.creditbureau.simulator.domain.model.FactorContribution f) {
+        String cleanExplanation = f.explanation() != null
+                ? f.explanation().replace("\u20B9", "&#8377;").replace("₹", "&#8377;").replace("?", "&#8377;")
+                : "";
         return String.format("{\"name\":\"%s\",\"max\":%d,\"awarded\":%d,\"explanation\":\"%s\"}",
-                f.factorName(), f.maxPoints(), f.awardedPoints(), escapeJson(f.explanation()));
+                f.factorName(), f.maxPoints(), f.awardedPoints(), escapeJson(cleanExplanation));
     }
 
     private String escapeJson(String raw) {
@@ -580,7 +583,7 @@ public class WebServer {
 
         /* Score Gauge Hero Card */
         .score-hero-card {
-            padding: 28px 24px;
+            padding: 20px 20px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -588,67 +591,67 @@ public class WebServer {
 
         .gauge-wrap {
             position: relative;
-            width: 240px;
-            height: 200px;
-            margin: 0 auto 10px auto;
+            width: 250px;
+            height: 145px;
+            margin: 0 auto;
         }
 
         .gauge-svg {
-            width: 240px;
-            height: 200px;
-            transform: rotate(-10deg);
+            width: 250px;
+            height: 145px;
+            display: block;
         }
 
         .gauge-bg {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.07);
-            stroke-width: 16;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 14;
             stroke-linecap: round;
         }
 
         .gauge-fill {
             fill: none;
-            stroke-width: 16;
+            stroke-width: 14;
             stroke-linecap: round;
-            stroke-dasharray: 440;
-            stroke-dashoffset: 440;
-            transition: stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.6s ease;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.5s ease;
         }
 
         .gauge-center-content {
             position: absolute;
-            top: 75px;
+            top: 42px;
             left: 0;
             right: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            pointer-events: none;
         }
 
         .score-val {
-            font-size: 58px;
+            font-size: 50px;
             font-weight: 800;
-            letter-spacing: -2px;
+            letter-spacing: -1.5px;
             line-height: 1;
             font-feature-settings: "tnum";
             font-variant-numeric: tabular-nums;
         }
 
         .score-band-pill {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 4px 12px;
-            border-radius: 12px;
-            margin-top: 8px;
-            transition: all 0.4s;
+            letter-spacing: 0.8px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-top: 6px;
+            transition: all 0.3s;
         }
 
         .score-range-label {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-dim);
-            margin-top: 4px;
+            margin-top: 3px;
             font-family: 'JetBrains Mono', monospace;
         }
 
@@ -656,61 +659,86 @@ public class WebServer {
         .formula-card {
             background: rgba(15, 23, 42, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 14px;
-            padding: 14px;
-            margin-top: 20px;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-top: 14px;
             text-align: left;
         }
 
         .formula-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: var(--text-dim);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .formula-flow {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .formula-node {
             background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 3px 8px;
+            padding: 2px 7px;
             border-radius: 6px;
             color: var(--text-main);
         }
         .formula-node.accent { border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; }
         .formula-node.highlight { border-color: rgba(16, 185, 129, 0.5); color: #34d399; font-weight: 700; }
 
-        /* Stat Row */
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 11px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 13px;
+        /* Profile Grid Layout */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: var(--text-muted); }
-        .stat-val { font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-main); }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 8px 10px;
+        }
+
+        .stat-box.full-span {
+            grid-column: span 2;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .stat-val {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         /* Overrides Alert */
         .override-banner {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.12));
             border: 1px solid rgba(239, 68, 68, 0.35);
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-radius: 12px;
-            margin-top: 18px;
-            font-size: 13px;
+            margin-top: 14px;
+            font-size: 12px;
             line-height: 1.45;
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
             animation: fadeIn 0.4s ease;
@@ -996,12 +1024,12 @@ public class WebServer {
         <div>
             <!-- Hero Score Card -->
             <div class="glass score-hero-card">
-                <h3 style="font-size:14px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Credit Score Output</h3>
+                <h3 style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Credit Score Output</h3>
                 
                 <div class="gauge-wrap">
-                    <svg class="gauge-svg" viewBox="0 0 200 160">
-                        <path class="gauge-bg" d="M 25 135 A 75 75 0 1 1 175 135" />
-                        <path id="gaugeFill" class="gauge-fill" stroke="#38bdf8" d="M 25 135 A 75 75 0 1 1 175 135" />
+                    <svg class="gauge-svg" viewBox="0 0 240 145">
+                        <path class="gauge-bg" d="M 30 125 A 90 90 0 0 1 210 125" />
+                        <path id="gaugeFill" class="gauge-fill" stroke="#38bdf8" d="M 30 125 A 90 90 0 0 1 210 125" />
                     </svg>
                     <div class="gauge-center-content">
                         <div id="scoreValue" class="score-val">---</div>
@@ -1030,8 +1058,8 @@ public class WebServer {
             </div>
 
             <!-- Profile Summary Card -->
-            <div class="glass" style="padding:24px;margin-top:20px;">
-                <div class="section-header">
+            <div class="glass" style="padding:18px 20px;margin-top:16px;">
+                <div class="section-header" style="margin-bottom:12px;padding-bottom:8px;">
                     <h2>
                         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                         Consumer Profile
@@ -1039,33 +1067,35 @@ public class WebServer {
                     <span id="consumerIdBadge" class="section-badge">CON-001</span>
                 </div>
 
-                <div class="stat-row">
-                    <span class="stat-label">Merged Tradelines</span>
-                    <span id="profMerged" class="stat-val">---</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Active / Closed</span>
-                    <span id="profActiveClosed" class="stat-val">--- / ---</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Revolving Utilisation</span>
-                    <span id="profUtil" class="stat-val" style="color:#38bdf8;">---%</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Revolving Balance / Limit</span>
-                    <span id="profBalLimit" class="stat-val">₹0 / ₹0</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Oldest Account Age</span>
-                    <span id="profAge" class="stat-val">---</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Credit Portfolio Mix</span>
-                    <span id="profMix" class="stat-val">---</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Hard / Soft Enquiries</span>
-                    <span id="profEnq" class="stat-val">--- / ---</span>
+                <div class="profile-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Merged Tradelines</span>
+                        <div id="profMerged" class="stat-val">---</div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Active / Closed</span>
+                        <div id="profActiveClosed" class="stat-val">--- / ---</div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Revolving Utilisation</span>
+                        <div id="profUtil" class="stat-val" style="color:#38bdf8;">---%</div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Hard / Soft Enquiries</span>
+                        <div id="profEnq" class="stat-val">--- / ---</div>
+                    </div>
+                    <div class="stat-box full-span">
+                        <span class="stat-label">Revolving Balance / Limit</span>
+                        <div id="profBalLimit" class="stat-val">&#8377;0 / &#8377;0</div>
+                    </div>
+                    <div class="stat-box full-span">
+                        <span class="stat-label">Oldest Account Age</span>
+                        <div id="profAge" class="stat-val">---</div>
+                    </div>
+                    <div class="stat-box full-span">
+                        <span class="stat-label">Credit Portfolio Mix</span>
+                        <div id="profMix" class="stat-val">---</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1196,16 +1226,17 @@ public class WebServer {
         function renderReport(data) {
             document.getElementById('consumerIdBadge').textContent = data.consumerId;
 
-            // Score Gauge Arc Math (Total arc circumference ~ 353px for radius 75 across 270 deg)
+            // Score Gauge Arc Math
             const gaugeFill = document.getElementById('gaugeFill');
             const scoreVal = document.getElementById('scoreValue');
             const scoreBand = document.getElementById('scoreBand');
             const overrideBox = document.getElementById('overrideBox');
 
-            const totalArcLength = 353;
+            const totalLength = gaugeFill.getTotalLength() || 283;
+            gaugeFill.style.strokeDasharray = totalLength;
 
             if (data.isThinFile) {
-                gaugeFill.style.strokeDashoffset = totalArcLength;
+                gaugeFill.style.strokeDashoffset = totalLength;
                 gaugeFill.style.stroke = "#64748b";
                 scoreVal.textContent = "NA";
                 scoreVal.style.color = "#94a3b8";
@@ -1219,7 +1250,7 @@ public class WebServer {
             } else {
                 // Score Range 300 to 900 -> 0 to 600 points delta
                 const ratio = Math.max(0, Math.min(1, (data.finalScore - 300) / 600));
-                const targetOffset = totalArcLength - (ratio * totalArcLength);
+                const targetOffset = totalLength - (ratio * totalLength);
                 gaugeFill.style.strokeDashoffset = targetOffset;
 
                 animateCounter(scoreVal, data.finalScore);
@@ -1289,9 +1320,9 @@ public class WebServer {
 
             // Profile Stats
             document.getElementById('profMerged').textContent = data.profile.mergedAccounts;
-            document.getElementById('profActiveClosed').textContent = `${data.profile.activeAccounts} Active / ${data.profile.closedAccounts} Closed`;
+            document.getElementById('profActiveClosed').textContent = `${data.profile.activeAccounts} Act / ${data.profile.closedAccounts} Cls`;
             document.getElementById('profUtil').textContent = data.profile.revolvingUtilisation.toFixed(2) + "%";
-            document.getElementById('profBalLimit').textContent = `₹${data.profile.revolvingBalance.toLocaleString()} / ₹${data.profile.revolvingLimit.toLocaleString()}`;
+            document.getElementById('profBalLimit').textContent = `\u20B9${data.profile.revolvingBalance.toLocaleString()} / \u20B9${data.profile.revolvingLimit.toLocaleString()}`;
             document.getElementById('profAge').textContent = data.profile.oldestOpenDate ? `${data.profile.oldestAgeYears}y ${data.profile.oldestAgeMonths}m (${data.profile.oldestOpenDate})` : "None";
             document.getElementById('profMix').textContent = data.profile.hasMixedCredit ? "Secured + Unsecured" : "Single Category";
             document.getElementById('profEnq').textContent = `${data.profile.hardEnquiries} Hard / ${data.profile.softEnquiries} Soft`;
@@ -1327,8 +1358,8 @@ public class WebServer {
                                 <div style="display:flex;align-items:center;gap:10px;">
                                     <span class="dpd-chip ${statusClass}" style="padding:3px 10px;font-size:11px;">${acc.status}</span>
                                     <span style="font-family:'JetBrains Mono';font-size:12px;color:var(--text-muted);">
-                                        Limit: <strong style="color:var(--text-main);">₹${acc.limit.toLocaleString()}</strong> | 
-                                        Bal: <strong style="color:var(--text-main);">₹${acc.balance.toLocaleString()}</strong>
+                                        Limit: <strong style="color:var(--text-main);">&#8377;${acc.limit.toLocaleString()}</strong> | 
+                                        Bal: <strong style="color:var(--text-main);">&#8377;${acc.balance.toLocaleString()}</strong>
                                     </span>
                                 </div>
                             </div>
@@ -1340,13 +1371,15 @@ public class WebServer {
 
                             <div class="timeline-container">
                                 ${acc.dpdGrid.map(g => {
+                                    const cat = (!g.category || g.category === 'XXX') ? 'NR' : g.category;
                                     let badge = 'cat-nr';
-                                    if (g.category === 'STD') badge = 'cat-std';
-                                    else if (g.category === 'SMA-0') badge = 'cat-sma0';
-                                    else if (g.category === 'SMA-1') badge = 'cat-sma1';
-                                    else if (g.category === 'SMA-2') badge = 'cat-sma2';
-                                    else if (g.category === 'NPA') badge = 'cat-npa';
-                                    return `<div class="dpd-chip ${badge}" title="${g.yearMonth} (M${g.month}): ${g.dpd !== null ? g.dpd + ' DPD (' + g.category + ')' : 'No submission (NR)'}">${g.category}</div>`;
+                                    if (cat === 'STD') badge = 'cat-std';
+                                    else if (cat === 'SMA-0') badge = 'cat-sma0';
+                                    else if (cat === 'SMA-1') badge = 'cat-sma1';
+                                    else if (cat === 'SMA-2') badge = 'cat-sma2';
+                                    else if (cat === 'NPA') badge = 'cat-npa';
+                                    const tip = g.dpd !== null ? `${g.yearMonth} (Month ${g.month}): ${g.dpd} DPD [${cat}]` : `${g.yearMonth} (Month ${g.month}): Not Reported / No data (NR)`;
+                                    return `<div class="dpd-chip ${badge}" title="${tip}">${cat}</div>`;
                                 }).join('')}
                             </div>
                         </div>
@@ -1374,7 +1407,7 @@ public class WebServer {
                 numEl.style.color = color;
                 barEl.style.width = Math.min(100, (factor.awarded / max) * 100) + "%";
             }
-            descEl.textContent = factor.explanation || "";
+            descEl.innerHTML = factor.explanation || "";
         }
 
         function animateCounter(element, target) {
