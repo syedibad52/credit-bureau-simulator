@@ -671,6 +671,71 @@ select:disabled, input[type="date"]:disabled, button:disabled {
         scroll-behavior: auto !important;
     }
 }
+/* Bright glassmorphism layer: shared by the file preview and the embedded server UI. */
+:root {
+    color-scheme: light;
+    --color-paper: oklch(92% 0.045 245);
+    --color-paper-2: oklch(100% 0.001 250 / 0.48);
+    --color-paper-3: oklch(100% 0.001 250 / 0.28);
+    --color-paper-hover: oklch(100% 0.001 250 / 0.72);
+    --color-ink: oklch(25% 0.025 248);
+    --color-ink-2: oklch(39% 0.028 248);
+    --color-muted: oklch(50% 0.023 248);
+    --color-dim: oklch(61% 0.018 248);
+    --color-rule: oklch(100% 0.001 250 / 0.64);
+    --color-rule-2: oklch(83% 0.06 248 / 0.74);
+    --color-accent: oklch(61% 0.15 245);
+    --color-accent-hi: oklch(55% 0.17 245);
+    --color-accent-ink: oklch(100% 0.001 250);
+    --color-focus: oklch(55% 0.16 245);
+    --signal-lime: oklch(54% 0.15 150);
+    --signal-lime-bg: oklch(92% 0.06 150 / 0.52);
+    --signal-cyan: oklch(58% 0.15 240);
+    --signal-cyan-bg: oklch(91% 0.06 240 / 0.58);
+    --signal-blue: oklch(55% 0.14 255);
+    --signal-blue-bg: oklch(90% 0.06 255 / 0.58);
+    --signal-amber: oklch(67% 0.15 82);
+    --signal-amber-bg: oklch(94% 0.07 82 / 0.62);
+    --signal-rose: oklch(58% 0.18 25);
+    --signal-rose-bg: oklch(93% 0.07 25 / 0.58);
+    --signal-slate: oklch(52% 0.02 248);
+    --signal-slate-bg: oklch(91% 0.015 248 / 0.68);
+    --wash-blue: oklch(76% 0.13 240 / 0.58);
+    --wash-violet: oklch(79% 0.11 300 / 0.46);
+    --wash-amber: oklch(84% 0.12 85 / 0.46);
+    --shadow-glass: 0 22px 52px oklch(42% 0.08 245 / 0.16);
+}
+
+body { background: linear-gradient(135deg, var(--color-paper), var(--wash-violet)); background-attachment: fixed; }
+body::before, body::after { position: fixed; z-index: -1; width: 34rem; height: 34rem; border-radius: 50%; content: ""; filter: blur(20px); opacity: 0.66; pointer-events: none; }
+body::before { top: -15rem; right: -10rem; background-color: var(--wash-blue); animation: drift-one 12s var(--ease-in-out) infinite alternate; }
+body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber); animation: drift-two 15s var(--ease-in-out) infinite alternate; }
+.app-header, .scenarios-tray, .panel, .factors-row, .factor-tile, .chip-btn, select, input[type="date"] { backdrop-filter: blur(28px) saturate(1.32); -webkit-backdrop-filter: blur(28px) saturate(1.32); }
+.app-header { border: 1px solid var(--color-rule); border-radius: var(--radius-lg); background-color: var(--color-paper-2); box-shadow: var(--shadow-glass); padding: var(--space-lg); animation: surface-in var(--dur-long) var(--ease-out) both; }
+.scenarios-tray { border: 1px solid var(--color-rule); border-radius: var(--radius-md); background-color: var(--color-paper-2); box-shadow: 0 10px 26px oklch(47% 0.06 245 / 0.08); padding: var(--space-sm); animation: surface-in var(--dur-long) var(--ease-out) 80ms both; }
+.panel, .factor-tile { border-color: var(--color-rule); background-color: var(--color-paper-2); box-shadow: var(--shadow-glass); }
+.panel::before, .factor-tile::before { position: absolute; inset: 0; border: 1px solid var(--color-rule); border-radius: inherit; content: ""; opacity: 0.7; pointer-events: none; }
+.panel, .factor-tile { position: relative; overflow: hidden; }
+.hero-instrument { background-color: var(--color-paper-2); }
+.dashboard-grid > div:first-child .panel:first-child { animation: surface-in var(--dur-long) var(--ease-out) 140ms both; }
+.dashboard-grid > div:first-child .panel:last-child { animation: surface-in var(--dur-long) var(--ease-out) 210ms both; }
+.factors-row { box-shadow: var(--shadow-glass); animation: surface-in var(--dur-long) var(--ease-out) 160ms both; }
+.dashboard-grid > div:last-child > .panel { animation: surface-in var(--dur-long) var(--ease-out) 260ms both; }
+.factor-tile { transition: transform var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out); }
+@media (hover: hover) { .factor-tile:hover, .chip-btn:hover, .account-card:hover { transform: translateY(-2px); background-color: var(--color-paper-hover); } }
+.btn-primary { box-shadow: 0 10px 20px oklch(56% 0.12 245 / 0.23); transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out); }
+@media (hover: hover) { .btn-primary:hover { box-shadow: 0 14px 28px oklch(56% 0.12 245 / 0.28); transform: translateY(-1px); } }
+.gauge-progress { transition: stroke-dashoffset 760ms var(--ease-out), stroke var(--dur-short) var(--ease-out); }
+.score-display { color: var(--signal-cyan); text-shadow: 0 3px 18px oklch(61% 0.15 245 / 0.16); }
+.meter-track { background-color: var(--color-rule); }
+.timeline-grid { background-color: var(--color-paper-3); }
+.account-card { transition: transform var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out); }
+.node { background-color: var(--color-paper-3); }
+.rule-chip, .score-tier-tag { background-color: var(--signal-cyan-bg); }
+@keyframes surface-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes drift-one { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-5rem, 4rem, 0) scale(1.12); } }
+@keyframes drift-two { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(6rem, -3rem, 0) scale(1.14); } }
+@media (prefers-reduced-motion: reduce) { .app-header, .scenarios-tray, .panel, .factors-row, .dashboard-grid > div > .panel, body::before, body::after { animation: none; } }
     </style>
 </head>
 <body>
@@ -944,14 +1009,18 @@ select:disabled, input[type="date"]:disabled, button:disabled {
         async function loadReport() {
             const consumer = document.getElementById('consumerSelect').value;
             const asOf = document.getElementById('asOfDate').value;
+            const apiOrigin = window.location.protocol === 'file:' ? 'http://localhost:8080' : '';
 
             try {
-                const res = await fetch('/api/report?consumer=' + encodeURIComponent(consumer) + '&asOf=' + encodeURIComponent(asOf));
+                const res = await fetch(apiOrigin + '/api/report?consumer=' + encodeURIComponent(consumer) + '&asOf=' + encodeURIComponent(asOf));
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
                 renderReport(data);
             } catch (err) {
                 console.error('Failed to load report', err);
+                document.getElementById('scoreBand').textContent = 'Unable to load';
+                document.getElementById('accountsContainer').textContent = 'Could not load report data. Start the simulator server on localhost:8080, then try again.';
+                document.getElementById('rulesList').textContent = 'Report data is unavailable.';
             }
         }
 
