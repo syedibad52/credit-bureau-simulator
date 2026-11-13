@@ -736,6 +736,135 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 @keyframes drift-one { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-5rem, 4rem, 0) scale(1.12); } }
 @keyframes drift-two { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(6rem, -3rem, 0) scale(1.14); } }
 @media (prefers-reduced-motion: reduce) { .app-header, .scenarios-tray, .panel, .factors-row, .dashboard-grid > div > .panel, body::before, body::after { animation: none; } }
+
+/* Score board and mobile repayment layout. */
+.score-board {
+    --score-ratio: 0;
+    --score-percent: 0%;
+    display: grid;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    background-color: var(--color-paper-3);
+    overflow: hidden;
+}
+
+.score-board-head, .score-reading-row, .score-ruler-labels {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.score-board .instrument-title {
+    margin: 0;
+    color: var(--color-ink-2);
+}
+
+.score-reading-row { align-items: baseline; }
+
+.score-board .score-display {
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: clamp(4rem, 11vw, 6.5rem);
+    font-weight: 500;
+    letter-spacing: -0.09em;
+    line-height: 0.88;
+    text-shadow: none;
+}
+
+.score-out-of, .score-scale-hint, .score-ruler-labels {
+    color: var(--color-muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+}
+
+.score-tier-tag {
+    justify-self: start;
+    margin: 0;
+    padding: var(--space-2xs) var(--space-sm);
+    animation: score-tag-in var(--dur-short) var(--ease-out) both;
+}
+
+.score-ruler {
+    position: relative;
+    height: 12px;
+    margin-top: var(--space-xs);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-rule);
+    overflow: visible;
+}
+
+.score-ruler-fill {
+    position: absolute;
+    inset: 0;
+    transform: scaleX(var(--score-ratio));
+    transform-origin: left center;
+    border-radius: inherit;
+    background-color: var(--signal-cyan);
+    transition: transform 760ms var(--ease-out);
+}
+
+.score-ruler-marker {
+    position: absolute;
+    top: 50%;
+    left: var(--score-percent);
+    width: 22px;
+    height: 22px;
+    border: 4px solid var(--color-paper-2);
+    border-radius: 50%;
+    background-color: var(--signal-cyan);
+    box-shadow: 0 4px 12px oklch(48% 0.12 240 / 0.25);
+    transform: translate(-50%, -50%);
+}
+
+.score-ruler-labels { padding-inline: 1px; }
+
+.timeline-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-bottom: var(--space-xs);
+    scrollbar-color: var(--color-rule-2) transparent;
+    scrollbar-width: thin;
+}
+
+.timeline-grid {
+    min-width: 936px;
+    grid-template-columns: repeat(36, minmax(0, 1fr));
+}
+
+.account-identity, .account-summary { min-width: 0; }
+
+@media (max-width: 760px) {
+    .hero-instrument { padding: var(--space-md); }
+    .score-board { padding: var(--space-md); }
+    .score-board .score-display { font-size: clamp(3.8rem, 20vw, 5rem); }
+    .score-ruler { height: 10px; }
+    .matrix-legend {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        gap: var(--space-xs);
+    }
+    .matrix-legend > span { white-space: nowrap; }
+    .account-top { align-items: flex-start; }
+    .account-summary { width: 100%; }
+    .acc-meta { display: block; margin: var(--space-xs) 0 0; line-height: 1.45; }
+    .timeline-grid { min-width: 900px; }
+    .dpd-badge { min-height: 30px; font-size: 10px; }
+}
+
+@keyframes score-tag-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .score-tier-tag { animation: none; }
+    .score-ruler-fill { transition: none; }
+}
     </style>
 </head>
 <body>
@@ -824,18 +953,21 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
             <div>
                 <!-- Score Hero Panel -->
                 <section class="panel hero-instrument">
-                    <div class="instrument-title">Credit Score Output</div>
-
-                    <div class="gauge-wrap">
-                        <svg class="gauge-svg" viewBox="0 0 240 145" aria-hidden="true">
-                            <path class="gauge-track" d="M 30 125 A 90 90 0 0 1 210 125" />
-                            <path id="gaugeFill" class="gauge-progress" d="M 30 125 A 90 90 0 0 1 210 125" />
-                        </svg>
-                        <div class="gauge-center-content">
-                            <div id="scoreValue" class="score-display">---</div>
-                            <div id="scoreBand" class="score-tier-tag">Evaluating</div>
-                            <div class="score-scale-hint">Range: 300 to 900</div>
+                    <div class="score-board" aria-live="polite">
+                        <div class="score-board-head">
+                            <span class="instrument-title">Credit score</span>
+                            <span class="score-scale-hint">Live calculation</span>
                         </div>
+                        <div class="score-reading-row">
+                            <div id="scoreValue" class="score-display">---</div>
+                            <span class="score-out-of">/ 900</span>
+                        </div>
+                        <div id="scoreBand" class="score-tier-tag">Evaluating</div>
+                        <div class="score-ruler" aria-label="Credit score scale from 300 to 900">
+                            <span class="score-ruler-fill"></span>
+                            <span class="score-ruler-marker" aria-hidden="true"></span>
+                        </div>
+                        <div class="score-ruler-labels" aria-hidden="true"><span>300</span><span>600</span><span>900</span></div>
                     </div>
 
                     <div id="overrideBox" class="override-alert" style="display:none;"></div>
@@ -1027,17 +1159,14 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
         function renderReport(data) {
             document.getElementById('consumerIdBadge').textContent = data.consumerId;
 
-            const gaugeFill = document.getElementById('gaugeFill');
+            const scoreBoard = document.querySelector('.score-board');
             const scoreVal = document.getElementById('scoreValue');
             const scoreBand = document.getElementById('scoreBand');
             const overrideBox = document.getElementById('overrideBox');
 
-            const totalLength = gaugeFill.getTotalLength() || 283;
-            gaugeFill.style.strokeDasharray = totalLength;
-
             if (data.isThinFile) {
-                gaugeFill.style.strokeDashoffset = totalLength;
-                gaugeFill.style.stroke = 'var(--signal-slate)';
+                scoreBoard.style.setProperty('--score-ratio', '0');
+                scoreBoard.style.setProperty('--score-percent', '0%');
                 scoreVal.textContent = 'NA';
                 scoreBand.textContent = 'Thin File';
                 scoreBand.style.borderColor = 'var(--signal-rose)';
@@ -1047,33 +1176,28 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                 overrideBox.innerHTML = '<strong>Thin File Exclusion:</strong> ' + (data.thinFileReason || 'Fewer than 6 months history or 0 tradelines');
             } else {
                 const ratio = Math.max(0, Math.min(1, (data.finalScore - 300) / 600));
-                const targetOffset = totalLength - (ratio * totalLength);
-                gaugeFill.style.strokeDashoffset = targetOffset;
+                scoreBoard.style.setProperty('--score-ratio', ratio.toFixed(3));
+                scoreBoard.style.setProperty('--score-percent', (ratio * 100).toFixed(1) + '%');
 
                 animateCounter(scoreVal, data.finalScore);
 
                 if (data.finalScore >= 800) {
-                    gaugeFill.style.stroke = 'var(--signal-lime)';
                     scoreBand.textContent = 'Super-Prime';
                     scoreBand.style.borderColor = 'var(--signal-lime)';
                     scoreBand.style.color = 'var(--signal-lime)';
                 } else if (data.finalScore >= 720) {
-                    gaugeFill.style.stroke = 'var(--signal-cyan)';
                     scoreBand.textContent = 'Prime';
                     scoreBand.style.borderColor = 'var(--signal-cyan)';
                     scoreBand.style.color = 'var(--signal-cyan)';
                 } else if (data.finalScore >= 650) {
-                    gaugeFill.style.stroke = 'var(--signal-blue)';
                     scoreBand.textContent = 'Good / Near Prime';
                     scoreBand.style.borderColor = 'var(--signal-blue)';
                     scoreBand.style.color = 'var(--signal-blue)';
                 } else if (data.finalScore >= 550) {
-                    gaugeFill.style.stroke = 'var(--signal-amber)';
                     scoreBand.textContent = 'Moderate Risk';
                     scoreBand.style.borderColor = 'var(--signal-amber)';
                     scoreBand.style.color = 'var(--signal-amber)';
                 } else {
-                    gaugeFill.style.stroke = 'var(--signal-rose)';
                     scoreBand.textContent = 'High Risk';
                     scoreBand.style.borderColor = 'var(--signal-rose)';
                     scoreBand.style.color = 'var(--signal-rose)';
@@ -1134,12 +1258,12 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                     const statusClass = acc.status === 'ACTIVE' ? 'cat-std' : (acc.status === 'CLOSED' ? 'cat-nr' : 'cat-npa');
                     return '<div class="account-card">' +
                         '<div class="account-top">' +
-                            '<div>' +
+                            '<div class="account-identity">' +
                                 '<span class="acc-title">' + acc.accountId + '</span>' +
-                                '<span class="acc-meta">' + acc.lender + ' &bull; ' + acc.type + ' &bull; Opened ' + acc.openDate + '</span>' +
+                                '<span class="acc-meta">' + acc.lender + ' / ' + acc.type + ' / Opened ' + acc.openDate + '</span>' +
                                 (!acc.included ? ('<span class="status-badge" style="background-color:var(--signal-rose-bg);color:var(--signal-rose);border-color:var(--signal-rose);margin-left:8px;">Excluded: ' + acc.exclusionReason + '</span>') : '') +
                             '</div>' +
-                            '<div style="display:flex;align-items:center;gap:8px;">' +
+                            '<div class="account-summary">' +
                                 '<span class="dpd-badge ' + statusClass + '" style="padding:2px 8px;font-size:11px;">' + acc.status + '</span>' +
                                 '<span style="font-family:var(--font-mono);font-size:12px;color:var(--color-muted);">' +
                                     'Limit: <strong style="color:var(--color-ink);">&#8377;' + acc.limit.toLocaleString() + '</strong> | ' +
@@ -1147,7 +1271,7 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                                 '</span>' +
                             '</div>' +
                         '</div>' +
-                        '<div class="timeline-grid">' +
+                        '<div class="timeline-scroll" tabindex="0" aria-label="36-month repayment history. Swipe or scroll sideways to view every month."><div class="timeline-grid">' +
                             acc.dpdGrid.map(function(g) {
                                 const cat = (!g.category || g.category === 'XXX') ? 'NR' : g.category;
                                 let badge = 'cat-nr';
@@ -1159,7 +1283,7 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                                 const tip = g.dpd !== null ? (g.yearMonth + ' (Month ' + g.month + '): ' + g.dpd + ' DPD [' + cat + ']') : (g.yearMonth + ' (Month ' + g.month + '): Not Reported / No data (NR)');
                                 return '<div class="dpd-badge ' + badge + '" title="' + tip + '">' + cat + '</div>';
                             }).join('') +
-                        '</div>' +
+                        '</div></div>' +
                     '</div>';
                 }).join('');
             }
