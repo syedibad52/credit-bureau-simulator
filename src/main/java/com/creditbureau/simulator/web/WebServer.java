@@ -304,908 +304,953 @@ public class WebServer {
     }
 
     private String getDashboardHtml() {
+        try {
+            java.nio.file.Path p = java.nio.file.Path.of("index.html");
+            if (java.nio.file.Files.exists(p)) {
+                return java.nio.file.Files.readString(p, java.nio.charset.StandardCharsets.UTF_8);
+            }
+        } catch (Exception ignored) {}
         return """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credit Bureau Score Simulation Engine — BFSI Platform</title>
+    <meta name="description" content="Deterministic credit bureau score simulation engine and interactive audit platform for consumer credit profiles.">
+    <title>Credit Bureau Score Simulation Engine: BFSI Evaluation Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-base: #060913;
-            --glass-bg: rgba(15, 23, 42, 0.68);
-            --glass-card: rgba(22, 33, 58, 0.58);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-border-hover: rgba(56, 189, 248, 0.35);
-            --glass-inner-glow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --text-dim: #64748b;
-            --emerald: #10b981;
-            --emerald-glow: rgba(16, 185, 129, 0.35);
-            --cyan: #06b6d4;
-            --blue: #3b82f6;
-            --amber: #f59e0b;
-            --rose: #ef4444;
-            --purple: #8b5cf6;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 24px 32px;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Ambient Glowing Mesh Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -150px;
-            left: -100px;
-            width: 650px;
-            height: 650px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.14) 0%, rgba(99, 102, 241, 0.08) 50%, transparent 75%);
-            filter: blur(80px);
-            z-index: -2;
-            pointer-events: none;
-            animation: pulseOrb1 16s ease-in-out infinite alternate;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -150px;
-            right: -100px;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 75%);
-            filter: blur(90px);
-            z-index: -2;
-            pointer-events: none;
-            animation: pulseOrb2 20s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulseOrb1 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(120px, 80px) scale(1.15); }
-        }
-        @keyframes pulseOrb2 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-100px, -60px) scale(1.2); }
-        }
-
-        /* Frosted Glass Component */
-        .glass {
-            background: var(--glass-card);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45), var(--glass-inner-glow);
-            border-radius: 20px;
-            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass:hover {
-            border-color: var(--glass-border-hover);
-            box-shadow: 0 16px 42px 0 rgba(0, 0, 0, 0.55), 0 0 20px 0 rgba(56, 189, 248, 0.12), var(--glass-inner-glow);
-        }
-
-        /* Header Navigation */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .logo-group {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .logo-icon {
-            width: 46px;
-            height: 46px;
-            background: linear-gradient(135deg, #06b6d4, #6366f1);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
-        }
-
-        .logo-icon svg { width: 26px; height: 26px; fill: white; }
-
-        .title-text h1 {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .title-text p {
-            font-size: 13px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .badge-live {
-            background: rgba(16, 185, 129, 0.18);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            font-size: 11px;
-            padding: 1px 8px;
-            border-radius: 20px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .badge-live::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: #34d399;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #34d399;
-            animation: blink 1.8s infinite;
-        }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        /* Top Controls Bar */
-        .controls-glass {
-            padding: 10px 18px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            border-radius: 16px;
-            background: rgba(15, 23, 42, 0.7);
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        select, input[type="date"] {
-            background: rgba(30, 41, 59, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-            padding: 9px 14px;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 500;
-            outline: none;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        select:focus, input[type="date"]:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
-        }
-
-        .btn-evaluate {
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
-            color: white;
-            font-weight: 700;
-            font-size: 13px;
-            padding: 10px 22px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            box-shadow: 0 4px 18px rgba(79, 70, 229, 0.45);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-evaluate:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 24px rgba(79, 70, 229, 0.65);
-            background: linear-gradient(135deg, #1d4ed8, #4338ca);
-        }
-
-        .btn-evaluate:active { transform: translateY(1px); }
-
-        /* Scenario Quick-Filter Chips */
-        .scenarios-tray {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 4px 0 16px 0;
-            scrollbar-width: none;
-        }
-        .scenarios-tray::-webkit-scrollbar { display: none; }
-
-        .chip {
-            background: rgba(30, 41, 59, 0.55);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-muted);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .chip:hover {
-            background: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
-            border-color: rgba(56, 189, 248, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .chip.active {
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.3), rgba(79, 70, 229, 0.3));
-            color: #ffffff;
-            border-color: rgba(99, 102, 241, 0.6);
-            box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
-        }
-
-        /* Main Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 24px;
-        }
-
-        @media (max-width: 1080px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-        }
-
-        /* Score Gauge Hero Card */
-        .score-hero-card {
-            padding: 20px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .gauge-wrap {
-            position: relative;
-            width: 250px;
-            height: 145px;
-            margin: 0 auto;
-        }
-
-        .gauge-svg {
-            width: 250px;
-            height: 145px;
-            display: block;
-        }
-
-        .gauge-bg {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.08);
-            stroke-width: 14;
-            stroke-linecap: round;
-        }
-
-        .gauge-fill {
-            fill: none;
-            stroke-width: 14;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.5s ease;
-        }
-
-        .gauge-center-content {
-            position: absolute;
-            top: 42px;
-            left: 0;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-        }
-
-        .score-val {
-            font-size: 50px;
-            font-weight: 800;
-            letter-spacing: -1.5px;
-            line-height: 1;
-            font-feature-settings: "tnum";
-            font-variant-numeric: tabular-nums;
-        }
-
-        .score-band-pill {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            padding: 3px 10px;
-            border-radius: 10px;
-            margin-top: 6px;
-            transition: all 0.3s;
-        }
-
-        .score-range-label {
-            font-size: 10px;
-            color: var(--text-dim);
-            margin-top: 3px;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Interactive Formula Flow */
-        .formula-card {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: 10px 12px;
-            margin-top: 14px;
-            text-align: left;
-        }
-
-        .formula-title {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--text-dim);
-            margin-bottom: 6px;
-        }
-
-        .formula-flow {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 5px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-        }
-
-        .formula-node {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 2px 7px;
-            border-radius: 6px;
-            color: var(--text-main);
-        }
-        .formula-node.accent { border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; }
-        .formula-node.highlight { border-color: rgba(16, 185, 129, 0.5); color: #34d399; font-weight: 700; }
-
-        /* Profile Grid Layout */
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .stat-box {
-            background: rgba(15, 23, 42, 0.45);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 8px 10px;
-        }
-
-        .stat-box.full-span {
-            grid-column: span 2;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-            display: block;
-        }
-
-        .stat-val {
-            font-size: 12px;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Overrides Alert */
-        .override-banner {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.12));
-            border: 1px solid rgba(239, 68, 68, 0.35);
-            padding: 12px 14px;
-            border-radius: 12px;
-            margin-top: 14px;
-            font-size: 12px;
-            line-height: 1.45;
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Factor Cards Grid */
-        .factors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .factor-card {
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .factor-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #38bdf8, transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .factor-card:hover::before { opacity: 1; }
-
-        .factor-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-
-        .factor-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .factor-max {
-            font-size: 11px;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-dim);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2px 6px;
-            border-radius: 6px;
-        }
-
-        .factor-num {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin: 6px 0;
-            font-feature-settings: "tnum";
-            font-variant-numeric: tabular-nums;
-        }
-
-        .factor-bar-track {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .factor-bar-fill {
-            height: 100%;
-            border-radius: 6px;
-            width: 0%;
-            transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .factor-explanation {
-            font-size: 11px;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        /* Accounts Section */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .section-header h2 {
-            font-size: 17px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-badge {
-            background: rgba(56, 189, 248, 0.14);
-            color: #38bdf8;
-            font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-
-        .account-item {
-            padding: 20px;
-            margin-bottom: 16px;
-            border-radius: 16px;
-            background: rgba(18, 26, 46, 0.45);
-        }
-
-        .account-item:last-child { margin-bottom: 0; }
-
-        .account-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .acc-id {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 15px;
-            font-weight: 700;
-            color: #38bdf8;
-        }
-
-        .acc-tag {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-left: 8px;
-        }
-
-        /* 36-Month Timeline Matrix */
-        .timeline-container {
-            display: grid;
-            grid-template-columns: repeat(36, minmax(0, 1fr));
-            gap: 3px;
-            background: rgba(10, 15, 28, 0.7);
-            padding: 10px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        @media (max-width: 900px) {
-            .timeline-container { grid-template-columns: repeat(18, minmax(0, 1fr)); }
-        }
-
-        .dpd-chip {
-            padding: 8px 1px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 9px;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .dpd-chip:hover {
-            transform: translateY(-2px) scale(1.15);
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* DPD Category Badges */
-        .cat-std  { background: rgba(16, 185, 129, 0.22); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
-        .cat-sma0 { background: rgba(59, 130, 246, 0.25); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.45); }
-        .cat-sma1 { background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.45); }
-        .cat-sma2 { background: rgba(249, 115, 22, 0.28); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.5); }
-        .cat-npa  { background: rgba(239, 68, 68, 0.35);  color: #f87171; border: 1px solid rgba(239, 68, 68, 0.6); box-shadow: 0 0 10px rgba(239, 68, 68, 0.35); }
-        .cat-nr   { background: rgba(255, 255, 255, 0.04); color: #64748b; border: 1px solid rgba(255, 255, 255, 0.06); }
-
-        /* Business Rule Tag */
-        .rule-pill {
-            display: inline-block;
-            background: rgba(56, 189, 248, 0.12);
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            font-size: 12px;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            padding: 3px 10px;
-            border-radius: 8px;
-            margin: 3px 6px 3px 0;
-            transition: all 0.2s;
-        }
-
-        .rule-pill:hover {
-            background: rgba(56, 189, 248, 0.25);
-            border-color: #38bdf8;
-            transform: translateY(-1px);
-        }
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Vantage (deal 3/3, seed credit-bureau-score-simulation-846d·1e9b8a52·2026-11-13·r0)
+ * nav: edge-aligned · signature: score-arc-instrument · states: all-eight · vantage: terrain/steel
+ * axes: dark/grotesk-sans/chromatic-lime · posture: restrained · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: R4, strictly snapped to 4px spacing grid */
+
+:root {
+    color-scheme: dark;
+    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --color-paper: oklch(14% 0.012 235);
+    --color-paper-2: oklch(18% 0.014 235);
+    --color-paper-3: oklch(22% 0.016 235);
+    --color-paper-hover: oklch(24% 0.018 235);
+
+    --color-ink: oklch(96% 0.006 230);
+    --color-ink-2: oklch(84% 0.012 230);
+    --color-muted: oklch(68% 0.016 230);
+    --color-dim: oklch(52% 0.018 230);
+
+    --color-rule: oklch(26% 0.014 235);
+    --color-rule-2: oklch(34% 0.016 235);
+    --color-rule-focus: oklch(88% 0.19 126);
+
+    --color-accent: oklch(88% 0.19 126);
+    --color-accent-hi: oklch(93% 0.17 126);
+    --color-accent-ink: oklch(16% 0.03 126);
+    --color-focus: oklch(88% 0.19 126);
+
+    --signal-lime: oklch(88% 0.19 126);
+    --signal-lime-bg: oklch(22% 0.05 126);
+    --signal-cyan: oklch(82% 0.14 210);
+    --signal-cyan-bg: oklch(22% 0.04 210);
+    --signal-blue: oklch(76% 0.13 245);
+    --signal-blue-bg: oklch(22% 0.04 245);
+    --signal-amber: oklch(80% 0.16 75);
+    --signal-amber-bg: oklch(22% 0.05 75);
+    --signal-rose: oklch(68% 0.20 25);
+    --signal-rose-bg: oklch(22% 0.06 25);
+    --signal-slate: oklch(50% 0.02 230);
+    --signal-slate-bg: oklch(20% 0.01 230);
+
+    --space-2xs: 4px;
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-md: 16px;
+    --space-lg: 20px;
+    --space-xl: 24px;
+    --space-2xl: 32px;
+
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-pill: 999px;
+
+    --tracking-display: -0.025em;
+    --container: 1440px;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    overflow-x: clip;
+}
+
+body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: var(--space-xl) var(--space-2xl);
+    min-height: 100vh;
+    caret-color: var(--color-accent);
+}
+
+::selection {
+    background-color: var(--color-accent);
+    color: var(--color-accent-ink);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.15;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+h1 { font-size: 20px; color: var(--color-ink); }
+h2 { font-size: 15px; color: var(--color-ink); }
+h3 { font-size: 13px; color: var(--color-muted); }
+
+.layout-wrap {
+    max-width: var(--container);
+    margin-inline: auto;
+}
+
+/* App Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-rule);
+}
+
+.brand-block {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.brand-icon {
+    width: 36px;
+    height: 36px;
+    background-color: var(--color-paper-3);
+    border: 1px solid var(--color-rule-2);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+}
+
+.brand-title-group h1 {
+    font-size: 18px;
+    margin-bottom: var(--space-2xs);
+}
+
+.brand-subtitle {
+    font-size: 12px;
+    color: var(--color-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.status-badge {
+    background-color: var(--signal-lime-bg);
+    color: var(--signal-lime);
+    border: 1px solid var(--color-rule);
+    font-size: 11px;
+    font-weight: 600;
+    padding: var(--space-2xs) var(--space-xs);
+    border-radius: var(--radius-pill);
+}
+
+/* Command Controls */
+.controls-panel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.field-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 12px;
+    color: var(--color-muted);
+}
+
+select, input[type="date"] {
+    background-color: var(--color-paper-2);
+    border: 1px solid var(--color-rule);
+    color: var(--color-ink);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+select:hover, input[type="date"]:hover {
+    border-color: var(--color-rule-2);
+}
+
+select:disabled, input[type="date"]:disabled, button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: var(--color-accent);
+    color: var(--color-accent-ink);
+    font-weight: 700;
+    font-size: 13px;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-accent);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-accent-hi);
+}
+
+.btn-primary:active {
+    background-color: var(--color-accent);
+    transform: translateY(1px);
+}
+
+/* Scenario Tray */
+.scenarios-tray {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    overflow-x: auto;
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-rule) transparent;
+}
+
+.tray-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-dim);
+    margin-right: var(--space-2xs);
+    white-space: nowrap;
+}
+
+.chip-btn {
+    background-color: var(--color-paper-2);
+    border: 1px solid var(--color-rule);
+    color: var(--color-muted);
+    padding: var(--space-2xs) var(--space-sm);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.chip-btn:hover {
+    background-color: var(--color-paper-3);
+    color: var(--color-ink);
+    border-color: var(--color-rule-2);
+}
+
+.chip-btn:active {
+    transform: translateY(1px);
+}
+
+.chip-btn.active {
+    background-color: var(--color-paper-3);
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+/* Main Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: var(--space-xl);
+    align-items: start;
+}
+
+@media (max-width: 1040px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Panels */
+.panel {
+    background-color: var(--color-paper-2);
+    color: var(--color-ink);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--color-rule);
+}
+
+/* Left Hero Score Instrument */
+.hero-instrument {
+    text-align: center;
+}
+
+.instrument-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-muted);
+    margin-bottom: var(--space-xs);
+}
+
+.gauge-wrap {
+    position: relative;
+    width: 240px;
+    height: 140px;
+    margin: 0 auto;
+}
+
+.gauge-svg {
+    width: 240px;
+    height: 140px;
+    display: block;
+}
+
+.gauge-track {
+    fill: none;
+    stroke: var(--color-rule);
+    stroke-width: 12;
+    stroke-linecap: round;
+}
+
+.gauge-progress {
+    fill: none;
+    stroke: var(--signal-cyan);
+    stroke-width: 12;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s var(--ease-out), stroke 0.3s ease;
+}
+
+.gauge-center-content {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.score-display {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+}
+
+.score-tier-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: var(--space-2xs) var(--space-sm);
+    border-radius: var(--radius-pill);
+    margin-top: var(--space-xs);
+    border: 1px solid var(--color-rule);
+    background-color: var(--color-paper-3);
+    color: var(--color-ink-2);
+}
+
+.score-scale-hint {
+    font-size: 10px;
+    color: var(--color-dim);
+    margin-top: var(--space-2xs);
+    font-family: var(--font-mono);
+}
+
+/* Override Notice */
+.override-alert {
+    background-color: var(--signal-rose-bg);
+    border: 1px solid var(--signal-rose);
+    color: var(--color-ink);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    margin-top: var(--space-md);
+    font-size: 12px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+/* Formula Block (Flat Ruled, No Card Inside Card) */
+.formula-section {
+    margin-top: var(--space-md);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-rule);
+    text-align: left;
+}
+
+.formula-heading {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-dim);
+    margin-bottom: var(--space-xs);
+}
+
+.formula-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs);
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
+.node {
+    background-color: var(--color-paper-3);
+    border: 1px solid var(--color-rule);
+    padding: var(--space-2xs) var(--space-xs);
+    border-radius: var(--radius-xs);
+    color: var(--color-ink-2);
+}
+
+.node.accent {
+    border-color: var(--signal-cyan);
+    color: var(--signal-cyan);
+}
+
+.node.highlight {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
+/* Profile Grid */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xs);
+}
+
+.stat-cell {
+    background-color: var(--color-paper-3);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-xs);
+    padding: var(--space-xs);
+}
+
+.stat-cell.span-full {
+    grid-column: span 2;
+}
+
+.cell-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--color-muted);
+    margin-bottom: var(--space-2xs);
+    display: block;
+}
+
+.cell-value {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--color-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Factor Cards */
+.factors-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.factor-tile {
+    background-color: var(--color-paper-2);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.factor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-xs);
+}
+
+.factor-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-ink-2);
+}
+
+.factor-cap {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--color-dim);
+}
+
+.factor-score-num {
+    font-size: 24px;
+    font-weight: 800;
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    margin: var(--space-2xs) 0;
+    color: var(--color-ink);
+}
+
+.meter-track {
+    height: 4px;
+    background-color: var(--color-rule);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    margin-bottom: var(--space-xs);
+}
+
+.meter-fill {
+    height: 100%;
+    border-radius: var(--radius-pill);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.6s var(--ease-out);
+}
+
+.bar-lime  { background-color: var(--signal-lime); }
+.bar-cyan  { background-color: var(--signal-cyan); }
+.bar-blue  { background-color: var(--signal-blue); }
+.bar-amber { background-color: var(--signal-amber); }
+.bar-rose  { background-color: var(--signal-rose); }
+.bar-slate { background-color: var(--signal-slate); }
+
+.factor-detail {
+    font-size: 11px;
+    color: var(--color-muted);
+    line-height: 1.35;
+}
+
+/* Repayment Matrix */
+.matrix-legend {
+    display: flex;
+    gap: var(--space-sm);
+    font-size: 11px;
+    color: var(--color-muted);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.account-card {
+    background-color: var(--color-paper-3);
+    color: var(--color-ink);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-sm);
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+}
+
+.account-card:last-child {
+    margin-bottom: 0;
+}
+
+.account-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xs);
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.acc-title {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--signal-cyan);
+}
+
+.acc-meta {
+    font-size: 11px;
+    color: var(--color-muted);
+    margin-left: var(--space-xs);
+}
+
+.timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(36, minmax(0, 1fr));
+    gap: var(--space-2xs);
+    background-color: var(--color-paper);
+    padding: var(--space-xs);
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--color-rule);
+}
+
+@media (max-width: 900px) {
+    .timeline-grid {
+        grid-template-columns: repeat(18, minmax(0, 1fr));
+    }
+}
+
+.dpd-badge {
+    padding: var(--space-2xs) 1px;
+    border-radius: var(--radius-xs);
+    text-align: center;
+    font-size: 9px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.dpd-badge:hover {
+    transform: translateY(-2px);
+}
+
+.cat-std  { background-color: var(--signal-lime-bg); color: var(--signal-lime); border: 1px solid var(--signal-lime); }
+.cat-sma0 { background-color: var(--signal-blue-bg); color: var(--signal-blue); border: 1px solid var(--signal-blue); }
+.cat-sma1 { background-color: var(--signal-amber-bg); color: var(--signal-amber); border: 1px solid var(--signal-amber); }
+.cat-sma2 { background-color: var(--signal-rose-bg); color: var(--signal-rose); border: 1px solid var(--signal-rose); }
+.cat-npa  { background-color: var(--signal-rose-bg); color: var(--signal-rose); border: 1px solid var(--signal-rose); }
+.cat-nr   { background-color: var(--signal-slate-bg); color: var(--color-ink-2); border: 1px solid var(--color-rule); }
+
+/* Rules Section */
+.rules-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+}
+
+.rule-chip {
+    background-color: var(--color-paper-3);
+    border: 1px solid var(--color-rule);
+    color: var(--signal-cyan);
+    font-size: 11px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    padding: var(--space-2xs) var(--space-xs);
+    border-radius: var(--radius-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
     </style>
 </head>
 <body>
-    <!-- Top Bar -->
-    <div class="header">
-        <div class="logo-group">
-            <div class="logo-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
-            </div>
-            <div class="title-text">
-                <h1>Credit Bureau Simulation Engine</h1>
-                <p>PS-022 BFSI Evaluation Platform <span class="badge-live">Engine Active</span></p>
-            </div>
-        </div>
-
-        <div class="controls-glass glass">
-            <div class="input-group">
-                <label for="consumerSelect">Consumer:</label>
-                <select id="consumerSelect" onchange="loadReport()">
-                    <option value="CON-001">CON-001 (1-Yr Age Boundary - EC-02)</option>
-                    <option value="CON-002">CON-002 (Dispute & Settlement)</option>
-                    <option value="CON-003">CON-003 (Delinquency Month 6 - 650 Cap - EC-04)</option>
-                    <option value="CON-004">CON-004 (Utilisation 30.0% - EC-01)</option>
-                    <option value="CON-005">CON-005 (Balance Correction & BNPL - EC-05)</option>
-                    <option value="CON-006">CON-006 (Delinquency Month 7 - No Cap - EC-04)</option>
-                    <option value="CON-007">CON-007 (Settled Account & Limit 0 CC)</option>
-                    <option value="CON-008">CON-008 (Written-Off Override 24m)</option>
-                    <option value="CON-009">CON-009 (Dispute Removed Retroactive - EC-06)</option>
-                    <option value="CON-010">CON-010 (Thin File: 5 Months - EC-07)</option>
-                    <option value="CON-011">CON-011 (Raw 1000 Capped at 900 - EC-08)</option>
-                    <option value="CON-012">CON-012 (Enquiries 14 Days Apart - EC-03)</option>
-                    <option value="CON-013">CON-013 (Thin File: 0 Tradelines - EC-07)</option>
-                    <option value="CON-014">CON-014 (Settled & Dispute Removed)</option>
-                    <option value="CON-015">CON-015 (Point-in-Time Cutoff & Dispute)</option>
-                    <option value="CON-016">CON-016 (Exactly 6 Months - Not Thin - EC-07)</option>
-                    <option value="CON-017">CON-017 (Utilisation 100.0% - EC-01)</option>
-                    <option value="CON-018">CON-018 (Account Merging Boundary 30d/5%)</option>
-                    <option value="CON-019">CON-019 (Suit Filed Override 550 Cap)</option>
-                    <option value="CON-020">CON-020 (Dispute Valid Retroactive - EC-06)</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label for="asOfDate">As-Of:</label>
-                <input type="date" id="asOfDate" value="2026-10-31">
-            </div>
-
-            <button class="btn-evaluate" onclick="loadReport()">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/><path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/></svg>
-                Evaluate Score
-            </button>
-        </div>
-    </div>
-
-    <!-- Quick Scenario Presets -->
-    <div class="scenarios-tray">
-        <span style="font-size:12px;color:var(--text-dim);font-weight:700;text-transform:uppercase;margin:auto 6px auto 0;">Scenarios:</span>
-        <button class="chip" onclick="selectScenario('CON-004', '2026-10-31')">💳 EC-01: Util 30.0% (CON-004)</button>
-        <button class="chip" onclick="selectScenario('CON-017', '2026-10-31')">⚡ EC-01: Util 100.0% (CON-017)</button>
-        <button class="chip" onclick="selectScenario('CON-001', '2026-10-31')">⏳ EC-02: 1-Yr Age (CON-001)</button>
-        <button class="chip" onclick="selectScenario('CON-003', '2026-10-31')">🚨 EC-04: M6 90 DPD Cap 650 (CON-003)</button>
-        <button class="chip" onclick="selectScenario('CON-006', '2026-10-31')">🛡️ EC-04: M7 90 DPD No Cap (CON-006)</button>
-        <button class="chip" onclick="selectScenario('CON-005', '2026-09-15')">💰 EC-05: Prelim Balance (CON-005)</button>
-        <button class="chip" onclick="selectScenario('CON-005', '2026-09-30')">✨ EC-05: Corrected Balance (CON-005)</button>
-        <button class="chip" onclick="selectScenario('CON-020', '2026-10-31')">⚖️ EC-06: Dispute Valid (CON-020)</button>
-        <button class="chip" onclick="selectScenario('CON-009', '2026-10-31')">🗑️ EC-06: Dispute Removed (CON-009)</button>
-        <button class="chip" onclick="selectScenario('CON-016', '2026-10-31')">📁 EC-07: 6-Mo Not Thin (CON-016)</button>
-        <button class="chip" onclick="selectScenario('CON-010', '2026-10-31')">🚫 EC-07: 5-Mo Thin File (CON-010)</button>
-        <button class="chip" onclick="selectScenario('CON-013', '2026-10-31')">❌ EC-07: 0 Tradelines (CON-013)</button>
-        <button class="chip" onclick="selectScenario('CON-011', '2026-10-31')">🏆 EC-08: 1000 Capped at 900 (CON-011)</button>
-        <button class="chip" onclick="selectScenario('CON-019', '2026-10-31')">⚖️ Trap: Suit Filed 550 (CON-019)</button>
-    </div>
-
-    <!-- Main Grid -->
-    <div class="dashboard-grid">
-        <!-- Left Column: Gauge & Profile -->
-        <div>
-            <!-- Hero Score Card -->
-            <div class="glass score-hero-card">
-                <h3 style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Credit Score Output</h3>
-                
-                <div class="gauge-wrap">
-                    <svg class="gauge-svg" viewBox="0 0 240 145">
-                        <path class="gauge-bg" d="M 30 125 A 90 90 0 0 1 210 125" />
-                        <path id="gaugeFill" class="gauge-fill" stroke="#38bdf8" d="M 30 125 A 90 90 0 0 1 210 125" />
+    <div class="layout-wrap">
+        <!-- App Header -->
+        <header class="app-header">
+            <div class="brand-block">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/>
                     </svg>
-                    <div class="gauge-center-content">
-                        <div id="scoreValue" class="score-val">---</div>
-                        <div id="scoreBand" class="score-band-pill">Evaluating</div>
-                        <div class="score-range-label">Range: 300 to 900</div>
-                    </div>
                 </div>
-
-                <div id="overrideBox" style="display:none;" class="override-banner"></div>
-
-                <!-- Step-by-Step Formula Flow -->
-                <div class="formula-card">
-                    <div class="formula-title">Deterministic Scoring Formula</div>
-                    <div class="formula-flow">
-                        <span class="formula-node">Base: 300</span>
-                        <span>+</span>
-                        <span id="formulaFactors" class="formula-node accent">+0 Ftr</span>
-                        <span>-</span>
-                        <span id="formulaEnq" class="formula-node">-0 Enq</span>
-                        <span>=</span>
-                        <span id="formulaRaw" class="formula-node">Raw: ---</span>
-                        <span>&rarr;</span>
-                        <span id="formulaFinal" class="formula-node highlight">Final: ---</span>
+                <div class="brand-title-group">
+                    <h1>Credit Bureau Simulation Engine</h1>
+                    <div class="brand-subtitle">
+                        <span>PS-022 BFSI Evaluation Platform</span>
+                        <span class="status-badge">Engine Active</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Profile Summary Card -->
-            <div class="glass" style="padding:18px 20px;margin-top:16px;">
-                <div class="section-header" style="margin-bottom:12px;padding-bottom:8px;">
-                    <h2>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        Consumer Profile
-                    </h2>
-                    <span id="consumerIdBadge" class="section-badge">CON-001</span>
+            <div class="controls-panel">
+                <div class="field-group">
+                    <label for="consumerSelect">Consumer:</label>
+                    <select id="consumerSelect" onchange="loadReport()">
+                        <option value="CON-001">CON-001 (1-Yr Age Boundary)</option>
+                        <option value="CON-002">CON-002 (Dispute and Settlement)</option>
+                        <option value="CON-003">CON-003 (Delinquency Month 6: 650 Cap)</option>
+                        <option value="CON-004">CON-004 (Utilisation 30.0%)</option>
+                        <option value="CON-005">CON-005 (Balance Correction and BNPL)</option>
+                        <option value="CON-006">CON-006 (Delinquency Month 7: No Cap)</option>
+                        <option value="CON-007">CON-007 (Settled Account and Limit 0 CC)</option>
+                        <option value="CON-008">CON-008 (Written-Off Override 24m)</option>
+                        <option value="CON-009">CON-009 (Dispute Removed Retroactive)</option>
+                        <option value="CON-010">CON-010 (Thin File: 5 Months)</option>
+                        <option value="CON-011">CON-011 (Raw 1000 Capped at 900)</option>
+                        <option value="CON-012">CON-012 (Enquiries 14 Days Apart)</option>
+                        <option value="CON-013">CON-013 (Thin File: 0 Tradelines)</option>
+                        <option value="CON-014">CON-014 (Settled and Dispute Removed)</option>
+                        <option value="CON-015">CON-015 (Point-in-Time Cutoff and Dispute)</option>
+                        <option value="CON-016">CON-016 (Exactly 6 Months: Eligible)</option>
+                        <option value="CON-017">CON-017 (Utilisation 100.0%)</option>
+                        <option value="CON-018">CON-018 (Account Merging Boundary 30d/5%)</option>
+                        <option value="CON-019">CON-019 (Suit Filed Override 550 Cap)</option>
+                        <option value="CON-020">CON-020 (Dispute Valid Retroactive)</option>
+                    </select>
                 </div>
 
-                <div class="profile-grid">
-                    <div class="stat-box">
-                        <span class="stat-label">Merged Tradelines</span>
-                        <div id="profMerged" class="stat-val">---</div>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Active / Closed</span>
-                        <div id="profActiveClosed" class="stat-val">--- / ---</div>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Revolving Utilisation</span>
-                        <div id="profUtil" class="stat-val" style="color:#38bdf8;">---%</div>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Hard / Soft Enquiries</span>
-                        <div id="profEnq" class="stat-val">--- / ---</div>
-                    </div>
-                    <div class="stat-box full-span">
-                        <span class="stat-label">Revolving Balance / Limit</span>
-                        <div id="profBalLimit" class="stat-val">&#8377;0 / &#8377;0</div>
-                    </div>
-                    <div class="stat-box full-span">
-                        <span class="stat-label">Oldest Account Age</span>
-                        <div id="profAge" class="stat-val">---</div>
-                    </div>
-                    <div class="stat-box full-span">
-                        <span class="stat-label">Credit Portfolio Mix</span>
-                        <div id="profMix" class="stat-val">---</div>
-                    </div>
+                <div class="field-group">
+                    <label for="asOfDate">As-Of:</label>
+                    <input type="date" id="asOfDate" value="2026-10-31">
                 </div>
+
+                <button class="btn-primary" onclick="loadReport()">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                        <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                    </svg>
+                    <span>Evaluate Score</span>
+                </button>
             </div>
-        </div>
+        </header>
 
-        <!-- Right Column: 5 Factors & 36-Month Accounts -->
-        <div>
-            <!-- Factor Cards (5 Cards) -->
-            <div class="factors-grid">
-                <!-- Payment History -->
-                <div class="glass factor-card">
-                    <div class="factor-head">
-                        <span class="factor-title">Payment History</span>
-                        <span class="factor-max">Max 300</span>
-                    </div>
-                    <div id="f1Num" class="factor-num" style="color:#34d399;">+300</div>
-                    <div class="factor-bar-track">
-                        <div id="f1Bar" class="factor-bar-fill" style="background:#34d399;"></div>
-                    </div>
-                    <div id="f1Desc" class="factor-explanation">Clean repayment history across all accounts.</div>
-                </div>
+        <!-- Scenario Quick Presets -->
+        <nav class="scenarios-tray" aria-label="Evaluation scenarios">
+            <span class="tray-title">Scenarios:</span>
+            <button class="chip-btn" onclick="selectScenario('CON-004', '2026-10-31')">[EC-01] Util 30% (CON-004)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-017', '2026-10-31')">[EC-01] Util 100% (CON-017)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-001', '2026-10-31')">[EC-02] 1-Yr Age (CON-001)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-003', '2026-10-31')">[EC-04] M6 90 DPD Cap 650 (CON-003)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-006', '2026-10-31')">[EC-04] M7 90 DPD No Cap (CON-006)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-005', '2026-09-15')">[EC-05] Prelim Balance (CON-005)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-005', '2026-09-30')">[EC-05] Corrected Bal (CON-005)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-020', '2026-10-31')">[EC-06] Dispute Valid (CON-020)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-009', '2026-10-31')">[EC-06] Dispute Removed (CON-009)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-016', '2026-10-31')">[EC-07] 6-Mo Eligible (CON-016)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-010', '2026-10-31')">[EC-07] 5-Mo Thin (CON-010)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-013', '2026-10-31')">[EC-07] 0 Tradelines (CON-013)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-011', '2026-10-31')">[EC-08] Cap at 900 (CON-011)</button>
+            <button class="chip-btn" onclick="selectScenario('CON-019', '2026-10-31')">[Trap] Suit Filed 550 (CON-019)</button>
+        </nav>
 
-                <!-- Utilisation -->
-                <div class="glass factor-card">
-                    <div class="factor-head">
-                        <span class="factor-title">Utilisation</span>
-                        <span class="factor-max">Max 200</span>
-                    </div>
-                    <div id="f2Num" class="factor-num" style="color:#38bdf8;">+200</div>
-                    <div class="factor-bar-track">
-                        <div id="f2Bar" class="factor-bar-fill" style="background:#38bdf8;"></div>
-                    </div>
-                    <div id="f2Desc" class="factor-explanation">Balance to revolving limit ratio.</div>
-                </div>
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-grid">
+            <!-- Left Column: Score Hero and Profile -->
+            <div>
+                <!-- Score Hero Panel -->
+                <section class="panel hero-instrument">
+                    <div class="instrument-title">Credit Score Output</div>
 
-                <!-- Credit Age -->
-                <div class="glass factor-card">
-                    <div class="factor-head">
-                        <span class="factor-title">Credit Age</span>
-                        <span class="factor-max">Max 100</span>
+                    <div class="gauge-wrap">
+                        <svg class="gauge-svg" viewBox="0 0 240 145" aria-hidden="true">
+                            <path class="gauge-track" d="M 30 125 A 90 90 0 0 1 210 125" />
+                            <path id="gaugeFill" class="gauge-progress" d="M 30 125 A 90 90 0 0 1 210 125" />
+                        </svg>
+                        <div class="gauge-center-content">
+                            <div id="scoreValue" class="score-display">---</div>
+                            <div id="scoreBand" class="score-tier-tag">Evaluating</div>
+                            <div class="score-scale-hint">Range: 300 to 900</div>
+                        </div>
                     </div>
-                    <div id="f3Num" class="factor-num" style="color:#818cf8;">+100</div>
-                    <div class="factor-bar-track">
-                        <div id="f3Bar" class="factor-bar-fill" style="background:#818cf8;"></div>
-                    </div>
-                    <div id="f3Desc" class="factor-explanation">Calendar age of oldest open account.</div>
-                </div>
 
-                <!-- Credit Mix -->
-                <div class="glass factor-card">
-                    <div class="factor-head">
-                        <span class="factor-title">Credit Mix</span>
-                        <span class="factor-max">Max 100</span>
-                    </div>
-                    <div id="f4Num" class="factor-num" style="color:#a855f7;">+100</div>
-                    <div class="factor-bar-track">
-                        <div id="f4Bar" class="factor-bar-fill" style="background:#a855f7;"></div>
-                    </div>
-                    <div id="f4Desc" class="factor-explanation">Portfolio balance between secured and unsecured.</div>
-                </div>
+                    <div id="overrideBox" class="override-alert" style="display:none;"></div>
 
-                <!-- Enquiries -->
-                <div class="glass factor-card">
-                    <div class="factor-head">
-                        <span class="factor-title">Enquiries</span>
-                        <span class="factor-max">Max -100</span>
+                    <!-- Deterministic Formula Flow (Flat, not nested card) -->
+                    <div class="formula-section">
+                        <div class="formula-heading">Deterministic Scoring Formula</div>
+                        <div class="formula-flow">
+                            <span class="node">Base: 300</span>
+                            <span>+</span>
+                            <span id="formulaFactors" class="node accent">+0 Ftr</span>
+                            <span>-</span>
+                            <span id="formulaEnq" class="node">-0 Enq</span>
+                            <span>=</span>
+                            <span id="formulaRaw" class="node">Raw: ---</span>
+                            <span>&rarr;</span>
+                            <span id="formulaFinal" class="node highlight">Final: ---</span>
+                        </div>
                     </div>
-                    <div id="f5Num" class="factor-num" style="color:#94a3b8;">0</div>
-                    <div class="factor-bar-track">
-                        <div id="f5Bar" class="factor-bar-fill" style="background:#f87171;"></div>
+                </section>
+
+                <!-- Profile Summary Panel -->
+                <section class="panel" style="margin-top: var(--space-md);">
+                    <div class="panel-header">
+                        <h2>Consumer Profile</h2>
+                        <span id="consumerIdBadge" class="status-badge">CON-001</span>
                     </div>
-                    <div id="f5Desc" class="factor-explanation">Hard enquiries penalty in recent 12 months.</div>
-                </div>
+
+                    <div class="profile-grid">
+                        <div class="stat-cell">
+                            <span class="cell-label">Merged Tradelines</span>
+                            <div id="profMerged" class="cell-value">---</div>
+                        </div>
+                        <div class="stat-cell">
+                            <span class="cell-label">Active / Closed</span>
+                            <div id="profActiveClosed" class="cell-value">--- / ---</div>
+                        </div>
+                        <div class="stat-cell">
+                            <span class="cell-label">Revolving Util</span>
+                            <div id="profUtil" class="cell-value">---%</div>
+                        </div>
+                        <div class="stat-cell">
+                            <span class="cell-label">Hard / Soft Enquiries</span>
+                            <div id="profEnq" class="cell-value">--- / ---</div>
+                        </div>
+                        <div class="stat-cell span-full">
+                            <span class="cell-label">Revolving Balance / Limit</span>
+                            <div id="profBalLimit" class="cell-value">&#8377;0 / &#8377;0</div>
+                        </div>
+                        <div class="stat-cell span-full">
+                            <span class="cell-label">Oldest Account Age</span>
+                            <div id="profAge" class="cell-value">---</div>
+                        </div>
+                        <div class="stat-cell span-full">
+                            <span class="cell-label">Credit Portfolio Mix</span>
+                            <div id="profMix" class="cell-value">---</div>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <!-- Merged Tradelines & 36-Month DPD Grid -->
-            <div class="glass" style="padding:24px;">
-                <div class="section-header">
-                    <h2>
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                        Merged Accounts & 36-Month Repayment Grid
-                    </h2>
-                    <div style="display:flex;gap:12px;font-size:11px;color:var(--text-muted);align-items:center;">
-                        <span style="display:flex;align-items:center;gap:4px;"><span class="dpd-chip cat-std" style="padding:2px 6px;">STD</span> 0 DPD</span>
-                        <span style="display:flex;align-items:center;gap:4px;"><span class="dpd-chip cat-sma0" style="padding:2px 6px;">1-29</span> SMA-0</span>
-                        <span style="display:flex;align-items:center;gap:4px;"><span class="dpd-chip cat-sma1" style="padding:2px 6px;">30-59</span> SMA-1</span>
-                        <span style="display:flex;align-items:center;gap:4px;"><span class="dpd-chip cat-sma2" style="padding:2px 6px;">60-89</span> SMA-2</span>
-                        <span style="display:flex;align-items:center;gap:4px;"><span class="dpd-chip cat-npa" style="padding:2px 6px;">90+</span> NPA</span>
-                        <span style="display:flex;align-items:center;gap:4px;"><span class="dpd-chip cat-nr" style="padding:2px 6px;">NR</span> No Data</span>
+            <!-- Right Column: 5 Factors and Repayment Matrix -->
+            <div>
+                <!-- Factor Summary Cards -->
+                <div class="factors-row">
+                    <!-- F1: Payment History -->
+                    <div class="factor-tile">
+                        <div class="factor-header">
+                            <span class="factor-name">Payment History</span>
+                            <span class="factor-cap">Max 300</span>
+                        </div>
+                        <div id="f1Num" class="factor-score-num">+300</div>
+                        <div class="meter-track">
+                            <div id="f1Bar" class="meter-fill bar-lime"></div>
+                        </div>
+                        <div id="f1Desc" class="factor-detail">Clean repayment record across all accounts.</div>
+                    </div>
+
+                    <!-- F2: Utilisation -->
+                    <div class="factor-tile">
+                        <div class="factor-header">
+                            <span class="factor-name">Utilisation</span>
+                            <span class="factor-cap">Max 200</span>
+                        </div>
+                        <div id="f2Num" class="factor-score-num">+200</div>
+                        <div class="meter-track">
+                            <div id="f2Bar" class="meter-fill bar-cyan"></div>
+                        </div>
+                        <div id="f2Desc" class="factor-detail">Revolving balance to credit limit ratio.</div>
+                    </div>
+
+                    <!-- F3: Credit Age -->
+                    <div class="factor-tile">
+                        <div class="factor-header">
+                            <span class="factor-name">Credit Age</span>
+                            <span class="factor-cap">Max 100</span>
+                        </div>
+                        <div id="f3Num" class="factor-score-num">+100</div>
+                        <div class="meter-track">
+                            <div id="f3Bar" class="meter-fill bar-blue"></div>
+                        </div>
+                        <div id="f3Desc" class="factor-detail">Calendar age of oldest open credit account.</div>
+                    </div>
+
+                    <!-- F4: Credit Mix -->
+                    <div class="factor-tile">
+                        <div class="factor-header">
+                            <span class="factor-name">Credit Mix</span>
+                            <span class="factor-cap">Max 100</span>
+                        </div>
+                        <div id="f4Num" class="factor-score-num">+100</div>
+                        <div class="meter-track">
+                            <div id="f4Bar" class="meter-fill bar-amber"></div>
+                        </div>
+                        <div id="f4Desc" class="factor-detail">Portfolio distribution between secured and unsecured debt.</div>
+                    </div>
+
+                    <!-- F5: Enquiries -->
+                    <div class="factor-tile">
+                        <div class="factor-header">
+                            <span class="factor-name">Enquiries</span>
+                            <span class="factor-cap">Max -100</span>
+                        </div>
+                        <div id="f5Num" class="factor-score-num">0</div>
+                        <div class="meter-track">
+                            <div id="f5Bar" class="meter-fill bar-rose"></div>
+                        </div>
+                        <div id="f5Desc" class="factor-detail">Hard credit inquiries in preceding 12 months.</div>
                     </div>
                 </div>
 
-                <div id="accountsContainer">Loading accounts...</div>
-            </div>
+                <!-- Merged Tradelines and 36-Month DPD Matrix -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <h2>Merged Accounts and 36-Month Repayment Grid</h2>
+                        <div class="matrix-legend">
+                            <span><span class="dpd-badge cat-std" style="padding: 2px 4px;">STD</span> 0 DPD</span>
+                            <span><span class="dpd-badge cat-sma0" style="padding: 2px 4px;">1-29</span> SMA-0</span>
+                            <span><span class="dpd-badge cat-sma1" style="padding: 2px 4px;">30-59</span> SMA-1</span>
+                            <span><span class="dpd-badge cat-sma2" style="padding: 2px 4px;">60-89</span> SMA-2</span>
+                            <span><span class="dpd-badge cat-npa" style="padding: 2px 4px;">90+</span> NPA</span>
+                            <span><span class="dpd-badge cat-nr" style="padding: 2px 4px;">NR</span> No Data</span>
+                        </div>
+                    </div>
 
-            <!-- Traceable Business Rules Applied -->
-            <div class="glass" style="padding:20px;margin-top:20px;">
-                <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">
-                    Applied Business Rules Register (Traceable)
-                </div>
-                <div id="rulesList">Loading rules...</div>
+                    <div id="accountsContainer">Loading accounts…</div>
+                </section>
+
+                <!-- Business Rules Traceability -->
+                <section class="panel" style="margin-top: var(--space-md);">
+                    <div class="panel-header">
+                        <h2>Applied Business Rules Register</h2>
+                    </div>
+                    <div id="rulesList" class="rules-container">Loading rules…</div>
+                </section>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
         function selectScenario(consumerId, asOfDate) {
             document.getElementById('consumerSelect').value = consumerId;
             document.getElementById('asOfDate').value = asOfDate;
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            if (event && event.target) event.target.classList.add('active');
+            document.querySelectorAll('.chip-btn').forEach(function(c) { c.classList.remove('active'); });
+            if (window.event && window.event.target) {
+                window.event.target.classList.add('active');
+            }
             loadReport();
         }
 
@@ -1214,19 +1259,18 @@ public class WebServer {
             const asOf = document.getElementById('asOfDate').value;
 
             try {
-                const res = await fetch(`/api/report?consumer=${consumer}&asOf=${asOf}`);
-                if (!res.ok) throw new Error("HTTP " + res.status);
+                const res = await fetch('/api/report?consumer=' + encodeURIComponent(consumer) + '&asOf=' + encodeURIComponent(asOf));
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
                 renderReport(data);
             } catch (err) {
-                console.error("Failed to load report", err);
+                console.error('Failed to load report', err);
             }
         }
 
         function renderReport(data) {
             document.getElementById('consumerIdBadge').textContent = data.consumerId;
 
-            // Score Gauge Arc Math
             const gaugeFill = document.getElementById('gaugeFill');
             const scoreVal = document.getElementById('scoreValue');
             const scoreBand = document.getElementById('scoreBand');
@@ -1237,18 +1281,15 @@ public class WebServer {
 
             if (data.isThinFile) {
                 gaugeFill.style.strokeDashoffset = totalLength;
-                gaugeFill.style.stroke = "#64748b";
-                scoreVal.textContent = "NA";
-                scoreVal.style.color = "#94a3b8";
-                scoreBand.textContent = "Thin File";
-                scoreBand.style.background = "rgba(248, 113, 113, 0.18)";
-                scoreBand.style.color = "#f87171";
-                scoreBand.style.border = "1px solid rgba(248, 113, 113, 0.4)";
+                gaugeFill.style.stroke = 'var(--signal-slate)';
+                scoreVal.textContent = 'NA';
+                scoreBand.textContent = 'Thin File';
+                scoreBand.style.borderColor = 'var(--signal-rose)';
+                scoreBand.style.color = 'var(--signal-rose)';
 
-                overrideBox.style.display = "block";
-                overrideBox.innerHTML = `<strong>⚠️ Thin File Exclusion</strong><br>${data.thinFileReason || "Fewer than 6 months history or 0 tradelines"}`;
+                overrideBox.style.display = 'block';
+                overrideBox.innerHTML = '<strong>Thin File Exclusion:</strong> ' + (data.thinFileReason || 'Fewer than 6 months history or 0 tradelines');
             } else {
-                // Score Range 300 to 900 -> 0 to 600 points delta
                 const ratio = Math.max(0, Math.min(1, (data.finalScore - 300) / 600));
                 const targetOffset = totalLength - (ratio * totalLength);
                 gaugeFill.style.strokeDashoffset = targetOffset;
@@ -1256,169 +1297,151 @@ public class WebServer {
                 animateCounter(scoreVal, data.finalScore);
 
                 if (data.finalScore >= 800) {
-                    gaugeFill.style.stroke = "var(--emerald)";
-                    scoreVal.style.color = "var(--emerald)";
-                    scoreBand.textContent = "Super-Prime";
-                    scoreBand.style.background = "rgba(16, 185, 129, 0.2)";
-                    scoreBand.style.color = "#34d399";
-                    scoreBand.style.border = "1px solid rgba(16, 185, 129, 0.45)";
+                    gaugeFill.style.stroke = 'var(--signal-lime)';
+                    scoreBand.textContent = 'Super-Prime';
+                    scoreBand.style.borderColor = 'var(--signal-lime)';
+                    scoreBand.style.color = 'var(--signal-lime)';
                 } else if (data.finalScore >= 720) {
-                    gaugeFill.style.stroke = "var(--cyan)";
-                    scoreVal.style.color = "var(--cyan)";
-                    scoreBand.textContent = "Prime";
-                    scoreBand.style.background = "rgba(6, 182, 212, 0.2)";
-                    scoreBand.style.color = "#38bdf8";
-                    scoreBand.style.border = "1px solid rgba(6, 182, 212, 0.45)";
+                    gaugeFill.style.stroke = 'var(--signal-cyan)';
+                    scoreBand.textContent = 'Prime';
+                    scoreBand.style.borderColor = 'var(--signal-cyan)';
+                    scoreBand.style.color = 'var(--signal-cyan)';
                 } else if (data.finalScore >= 650) {
-                    gaugeFill.style.stroke = "var(--blue)";
-                    scoreVal.style.color = "var(--blue)";
-                    scoreBand.textContent = "Good / Near Prime";
-                    scoreBand.style.background = "rgba(59, 130, 246, 0.2)";
-                    scoreBand.style.color = "#60a5fa";
-                    scoreBand.style.border = "1px solid rgba(59, 130, 246, 0.45)";
+                    gaugeFill.style.stroke = 'var(--signal-blue)';
+                    scoreBand.textContent = 'Good / Near Prime';
+                    scoreBand.style.borderColor = 'var(--signal-blue)';
+                    scoreBand.style.color = 'var(--signal-blue)';
                 } else if (data.finalScore >= 550) {
-                    gaugeFill.style.stroke = "var(--amber)";
-                    scoreVal.style.color = "var(--amber)";
-                    scoreBand.textContent = "Moderate Risk";
-                    scoreBand.style.background = "rgba(245, 158, 11, 0.2)";
-                    scoreBand.style.color = "#fbbf24";
-                    scoreBand.style.border = "1px solid rgba(245, 158, 11, 0.45)";
+                    gaugeFill.style.stroke = 'var(--signal-amber)';
+                    scoreBand.textContent = 'Moderate Risk';
+                    scoreBand.style.borderColor = 'var(--signal-amber)';
+                    scoreBand.style.color = 'var(--signal-amber)';
                 } else {
-                    gaugeFill.style.stroke = "var(--rose)";
-                    scoreVal.style.color = "var(--rose)";
-                    scoreBand.textContent = "High Risk";
-                    scoreBand.style.background = "rgba(239, 68, 68, 0.2)";
-                    scoreBand.style.color = "#f87171";
-                    scoreBand.style.border = "1px solid rgba(239, 68, 68, 0.45)";
+                    gaugeFill.style.stroke = 'var(--signal-rose)';
+                    scoreBand.textContent = 'High Risk';
+                    scoreBand.style.borderColor = 'var(--signal-rose)';
+                    scoreBand.style.color = 'var(--signal-rose)';
                 }
 
-                // Check active overrides
-                const activeOverrides = data.overrides.filter(o => o.applied);
+                const activeOverrides = data.overrides.filter(function(o) { return o.applied; });
                 if (activeOverrides.length > 0) {
-                    overrideBox.style.display = "block";
-                    overrideBox.innerHTML = activeOverrides.map(o => `
-                        <strong>🚨 [${o.ruleId}] Hard Override Cap: ${o.cap}</strong><br>
-                        ${o.name} &bull; ${o.reason}
-                    `).join('<hr style="border:0;border-top:1px solid rgba(239,68,68,0.25);margin:6px 0;">');
+                    overrideBox.style.display = 'block';
+                    overrideBox.innerHTML = activeOverrides.map(function(o) {
+                        return '<strong>[' + o.ruleId + '] Hard Override Cap: ' + o.cap + '</strong><br>' + o.name + ' (' + o.reason + ')';
+                    }).join('<hr style="border:0;border-top:1px solid var(--signal-rose);margin:8px 0;">');
                 } else {
-                    overrideBox.style.display = "none";
+                    overrideBox.style.display = 'none';
                 }
             }
 
             // Formula Flow Bar
             let totalPositiveFactors = 0;
             let enquiryDeduction = 0;
-            data.factors.forEach(f => {
-                if (f.name === "Enquiries") enquiryDeduction = Math.abs(f.awarded);
+            data.factors.forEach(function(f) {
+                if (f.name === 'Enquiries') enquiryDeduction = Math.abs(f.awarded);
                 else totalPositiveFactors += f.awarded;
             });
 
-            document.getElementById('formulaFactors').textContent = `+${totalPositiveFactors} Ftr`;
-            document.getElementById('formulaEnq').textContent = `-${enquiryDeduction} Enq`;
-            document.getElementById('formulaRaw').textContent = data.isThinFile ? "Raw: NA" : `Raw: ${data.preOverrideScore}`;
-            document.getElementById('formulaFinal').textContent = data.isThinFile ? "Final: NA" : `Final: ${data.finalScore}`;
+            document.getElementById('formulaFactors').textContent = '+' + totalPositiveFactors + ' Ftr';
+            document.getElementById('formulaEnq').textContent = '-' + enquiryDeduction + ' Enq';
+            document.getElementById('formulaRaw').textContent = data.isThinFile ? 'Raw: NA' : ('Raw: ' + data.preOverrideScore);
+            document.getElementById('formulaFinal').textContent = data.isThinFile ? 'Final: NA' : ('Final: ' + data.finalScore);
 
             // Profile Stats
             document.getElementById('profMerged').textContent = data.profile.mergedAccounts;
-            document.getElementById('profActiveClosed').textContent = `${data.profile.activeAccounts} Act / ${data.profile.closedAccounts} Cls`;
-            document.getElementById('profUtil').textContent = data.profile.revolvingUtilisation.toFixed(2) + "%";
-            document.getElementById('profBalLimit').textContent = `\u20B9${data.profile.revolvingBalance.toLocaleString()} / \u20B9${data.profile.revolvingLimit.toLocaleString()}`;
-            document.getElementById('profAge').textContent = data.profile.oldestOpenDate ? `${data.profile.oldestAgeYears}y ${data.profile.oldestAgeMonths}m (${data.profile.oldestOpenDate})` : "None";
-            document.getElementById('profMix').textContent = data.profile.hasMixedCredit ? "Secured + Unsecured" : "Single Category";
-            document.getElementById('profEnq').textContent = `${data.profile.hardEnquiries} Hard / ${data.profile.softEnquiries} Soft`;
+            document.getElementById('profActiveClosed').textContent = data.profile.activeAccounts + ' Act / ' + data.profile.closedAccounts + ' Cls';
+            document.getElementById('profUtil').textContent = data.profile.revolvingUtilisation.toFixed(2) + '%';
+            document.getElementById('profBalLimit').textContent = '\u20B9' + data.profile.revolvingBalance.toLocaleString() + ' / \u20B9' + data.profile.revolvingLimit.toLocaleString();
+            document.getElementById('profAge').textContent = data.profile.oldestOpenDate ? (data.profile.oldestAgeYears + 'y ' + data.profile.oldestAgeMonths + 'm (' + data.profile.oldestOpenDate + ')') : 'None';
+            document.getElementById('profMix').textContent = data.profile.hasMixedCredit ? 'Secured + Unsecured' : 'Single Category';
+            document.getElementById('profEnq').textContent = data.profile.hardEnquiries + ' Hard / ' + data.profile.softEnquiries + ' Soft';
 
             // Factors Cards
-            const f1 = data.factors.find(f => f.name.includes("Payment")) || { awarded: 0, max: 300, explanation: "" };
-            const f2 = data.factors.find(f => f.name.includes("Util")) || { awarded: 0, max: 200, explanation: "" };
-            const f3 = data.factors.find(f => f.name.includes("Age")) || { awarded: 0, max: 100, explanation: "" };
-            const f4 = data.factors.find(f => f.name.includes("Mix")) || { awarded: 0, max: 100, explanation: "" };
-            const f5 = data.factors.find(f => f.name.includes("Enquir")) || { awarded: 0, max: 0, explanation: "" };
+            const f1 = data.factors.find(function(f) { return f.name.indexOf('Payment') !== -1; }) || { awarded: 0, max: 300, explanation: '' };
+            const f2 = data.factors.find(function(f) { return f.name.indexOf('Util') !== -1; }) || { awarded: 0, max: 200, explanation: '' };
+            const f3 = data.factors.find(function(f) { return f.name.indexOf('Age') !== -1; }) || { awarded: 0, max: 100, explanation: '' };
+            const f4 = data.factors.find(function(f) { return f.name.indexOf('Mix') !== -1; }) || { awarded: 0, max: 100, explanation: '' };
+            const f5 = data.factors.find(function(f) { return f.name.indexOf('Enquir') !== -1; }) || { awarded: 0, max: 0, explanation: '' };
 
-            updateFactorCard('f1', f1, 300, '#34d399');
-            updateFactorCard('f2', f2, 200, '#38bdf8');
-            updateFactorCard('f3', f3, 100, '#818cf8');
-            updateFactorCard('f4', f4, 100, '#a855f7');
-            updateFactorCard('f5', f5, 100, '#f87171', true);
+            updateFactorCard('f1', f1, 300);
+            updateFactorCard('f2', f2, 200);
+            updateFactorCard('f3', f3, 100);
+            updateFactorCard('f4', f4, 100);
+            updateFactorCard('f5', f5, 100, true);
 
             // Accounts Container
             const container = document.getElementById('accountsContainer');
             if (!data.accounts || data.accounts.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-dim);padding:20px;text-align:center;">No accounts available for this consumer as-of the selected date.</div>';
+                container.innerHTML = '<div style="color:var(--color-dim);padding:16px;text-align:center;">No accounts available for this consumer as-of the selected date.</div>';
             } else {
-                container.innerHTML = data.accounts.map(acc => {
+                container.innerHTML = data.accounts.map(function(acc) {
                     const statusClass = acc.status === 'ACTIVE' ? 'cat-std' : (acc.status === 'CLOSED' ? 'cat-nr' : 'cat-npa');
-                    return `
-                        <div class="account-item">
-                            <div class="account-meta">
-                                <div>
-                                    <span class="acc-id">${acc.accountId}</span>
-                                    <span class="acc-tag">${acc.lender} &bull; ${acc.type} &bull; Opened ${acc.openDate}</span>
-                                    ${!acc.included ? `<span class="badge-live" style="background:rgba(239,68,68,0.2);color:#f87171;border-color:rgba(239,68,68,0.4);margin-left:8px;">Excluded: ${acc.exclusionReason}</span>` : ''}
-                                </div>
-                                <div style="display:flex;align-items:center;gap:10px;">
-                                    <span class="dpd-chip ${statusClass}" style="padding:3px 10px;font-size:11px;">${acc.status}</span>
-                                    <span style="font-family:'JetBrains Mono';font-size:12px;color:var(--text-muted);">
-                                        Limit: <strong style="color:var(--text-main);">&#8377;${acc.limit.toLocaleString()}</strong> | 
-                                        Bal: <strong style="color:var(--text-main);">&#8377;${acc.balance.toLocaleString()}</strong>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;display:flex;justify-content:space-between;">
-                                <span>36-Month Repayment Grid (Month 1 = As-Of Date &rarr; Month 36 = Oldest)</span>
-                                <span>Hover cell for DPD & month details</span>
-                            </div>
-
-                            <div class="timeline-container">
-                                ${acc.dpdGrid.map(g => {
-                                    const cat = (!g.category || g.category === 'XXX') ? 'NR' : g.category;
-                                    let badge = 'cat-nr';
-                                    if (cat === 'STD') badge = 'cat-std';
-                                    else if (cat === 'SMA-0') badge = 'cat-sma0';
-                                    else if (cat === 'SMA-1') badge = 'cat-sma1';
-                                    else if (cat === 'SMA-2') badge = 'cat-sma2';
-                                    else if (cat === 'NPA') badge = 'cat-npa';
-                                    const tip = g.dpd !== null ? `${g.yearMonth} (Month ${g.month}): ${g.dpd} DPD [${cat}]` : `${g.yearMonth} (Month ${g.month}): Not Reported / No data (NR)`;
-                                    return `<div class="dpd-chip ${badge}" title="${tip}">${cat}</div>`;
-                                }).join('')}
-                            </div>
-                        </div>
-                    `;
+                    return '<div class="account-card">' +
+                        '<div class="account-top">' +
+                            '<div>' +
+                                '<span class="acc-title">' + acc.accountId + '</span>' +
+                                '<span class="acc-meta">' + acc.lender + ' &bull; ' + acc.type + ' &bull; Opened ' + acc.openDate + '</span>' +
+                                (!acc.included ? ('<span class="status-badge" style="background-color:var(--signal-rose-bg);color:var(--signal-rose);border-color:var(--signal-rose);margin-left:8px;">Excluded: ' + acc.exclusionReason + '</span>') : '') +
+                            '</div>' +
+                            '<div style="display:flex;align-items:center;gap:8px;">' +
+                                '<span class="dpd-badge ' + statusClass + '" style="padding:2px 8px;font-size:11px;">' + acc.status + '</span>' +
+                                '<span style="font-family:var(--font-mono);font-size:12px;color:var(--color-muted);">' +
+                                    'Limit: <strong style="color:var(--color-ink);">&#8377;' + acc.limit.toLocaleString() + '</strong> | ' +
+                                    'Bal: <strong style="color:var(--color-ink);">&#8377;' + acc.balance.toLocaleString() + '</strong>' +
+                                '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="timeline-grid">' +
+                            acc.dpdGrid.map(function(g) {
+                                const cat = (!g.category || g.category === 'XXX') ? 'NR' : g.category;
+                                let badge = 'cat-nr';
+                                if (cat === 'STD') badge = 'cat-std';
+                                else if (cat === 'SMA-0') badge = 'cat-sma0';
+                                else if (cat === 'SMA-1') badge = 'cat-sma1';
+                                else if (cat === 'SMA-2') badge = 'cat-sma2';
+                                else if (cat === 'NPA') badge = 'cat-npa';
+                                const tip = g.dpd !== null ? (g.yearMonth + ' (Month ' + g.month + '): ' + g.dpd + ' DPD [' + cat + ']') : (g.yearMonth + ' (Month ' + g.month + '): Not Reported / No data (NR)');
+                                return '<div class="dpd-badge ' + badge + '" title="' + tip + '">' + cat + '</div>';
+                            }).join('') +
+                        '</div>' +
+                    '</div>';
                 }).join('');
             }
 
             // Rules List
             const rulesEl = document.getElementById('rulesList');
-            rulesEl.innerHTML = data.rules.map(r => `<span class="rule-pill" title="Business Rule ${r}">[${r}]</span>`).join('');
+            rulesEl.innerHTML = data.rules.map(function(r) {
+                return '<span class="rule-chip" title="Business Rule ' + r + '">[' + r + ']</span>';
+            }).join('');
         }
 
-        function updateFactorCard(prefix, factor, max, color, isDeduction = false) {
+        function updateFactorCard(prefix, factor, max, isDeduction) {
             const numEl = document.getElementById(prefix + 'Num');
             const barEl = document.getElementById(prefix + 'Bar');
             const descEl = document.getElementById(prefix + 'Desc');
 
             if (isDeduction) {
                 const ded = Math.abs(factor.awarded);
-                numEl.textContent = ded > 0 ? `-${ded}` : "0";
-                numEl.style.color = ded > 0 ? color : "var(--text-muted)";
-                barEl.style.width = Math.min(100, (ded / max) * 100) + "%";
+                numEl.textContent = ded > 0 ? ('-' + ded) : '0';
+                const ratio = Math.min(1, ded / max);
+                barEl.style.transform = 'scaleX(' + ratio + ')';
             } else {
-                numEl.textContent = `+${factor.awarded}`;
-                numEl.style.color = color;
-                barEl.style.width = Math.min(100, (factor.awarded / max) * 100) + "%";
+                numEl.textContent = '+' + factor.awarded;
+                const ratio = Math.min(1, Math.max(0, factor.awarded / max));
+                barEl.style.transform = 'scaleX(' + ratio + ')';
             }
-            descEl.innerHTML = factor.explanation || "";
+            descEl.innerHTML = factor.explanation || '';
         }
 
         function animateCounter(element, target) {
             let start = 300;
-            const duration = 800;
+            const duration = 600;
             const startTime = performance.now();
 
             function update(time) {
                 const elapsed = time - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                const current = Math.floor(start + (target - start) * easeOutExpo(progress));
+                const current = Math.floor(start + (target - start) * (1 - Math.pow(2, -10 * progress)));
                 element.textContent = current;
                 if (progress < 1) requestAnimationFrame(update);
                 else element.textContent = target;
@@ -1426,14 +1449,11 @@ public class WebServer {
             requestAnimationFrame(update);
         }
 
-        function easeOutExpo(x) {
-            return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
-        }
-
         window.onload = loadReport;
     </script>
 </body>
 </html>
-        """;
+
+""";
     }
 }
