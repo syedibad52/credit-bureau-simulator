@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Embedded lightweight HTTP server serving a rich, glassmorphism Credit Bureau Web Dashboard on localhost.
+ * Embedded lightweight HTTP server serving the Credit Bureau dashboard and API.
  */
 public class WebServer {
 
@@ -71,9 +71,10 @@ public class WebServer {
     }
 
     public void start() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", port), 0);
 
         server.createContext("/", this::handleRoot);
+        server.createContext("/health", this::handleHealth);
         server.createContext("/api/consumers", this::handleConsumers);
         server.createContext("/api/report", this::handleReport);
         server.createContext("/api/history", this::handleHistory);
@@ -82,7 +83,7 @@ public class WebServer {
         server.start();
 
         System.out.println("========================================================================");
-        System.out.printf("  🚀 CREDIT BUREAU DASHBOARD RUNNING AT: http://localhost:%d%n", port);
+        System.out.printf("  CREDIT BUREAU DASHBOARD RUNNING AT: http://localhost:%d%n", port);
         System.out.println("========================================================================");
         System.out.printf("  - Open http://localhost:%d in your web browser%n", port);
         System.out.println("  - Interactive credit score calculations, factor breakdowns & DPD grids");
@@ -97,6 +98,10 @@ public class WebServer {
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
+    }
+
+    private void handleHealth(HttpExchange exchange) throws IOException {
+        sendJsonResponse(exchange, "{\"status\":\"ok\"}");
     }
 
     private void handleConsumers(HttpExchange exchange) throws IOException {

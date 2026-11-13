@@ -220,7 +220,7 @@ public class CommandRouter {
     }
 
     private int handleServe(CommandArgs args) {
-        int port = 8080;
+        int port = resolveServerPort();
         try {
             WebServer server = new WebServer(port, Paths.get(args.dataDir()));
             server.start();
@@ -232,6 +232,20 @@ public class CommandRouter {
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * Uses the deployment platform's PORT when it is present and keeps 8080
+     * as the convenient local-development default.
+     */
+    private int resolveServerPort() {
+        String configuredPort = System.getenv().getOrDefault("PORT", "8080");
+        try {
+            return Integer.parseInt(configuredPort);
+        } catch (NumberFormatException e) {
+            logger.warn("Ignoring invalid PORT value '{}'; using 8080 instead", configuredPort);
+            return 8080;
+        }
     }
 
     private int handleEvaluate(CommandArgs args) {

@@ -82,6 +82,11 @@ See [BusinessRules.md](docs/BusinessRules.md) for the complete rule register.
 ```text
 credit-bureau-simulator/
 ├── index.html                  Frontend dashboard
+├── api/                         Vercel functions that proxy API calls
+├── lib/                         Shared code for Vercel functions
+├── Dockerfile                   Build instructions for the Java API container
+├── render.yaml                  Render service definition
+├── vercel.json                  Vercel function configuration
 ├── sample-data/                Demo input CSV files
 ├── test-data/                  Focused data used by tests
 ├── output/                     Generated evaluation reports
@@ -121,6 +126,15 @@ For a deeper explanation, read [Frontend guide](docs/Frontend.md) and [Backend g
 
 Use [PresentationGuide.md](docs/PresentationGuide.md) for a concise interview script.
 
+## Deploy it live
+
+The project is prepared for a split deployment:
+
+- **Render** runs the Java scoring API and reads the sample CSV data.
+- **Vercel** hosts the dashboard and proxies browser API requests to Render.
+
+Follow [Deployment.md](docs/Deployment.md) for the exact steps. The only value you need to supply is the Render service URL as Vercel's `BACKEND_URL` environment variable.
+
 ## Documentation
 
 - [Documentation index](docs/README.md)
@@ -131,6 +145,7 @@ Use [PresentationGuide.md](docs/PresentationGuide.md) for a concise interview sc
 - [Data dictionary](docs/DataDictionary.md)
 - [Test guide](docs/TestCases.md)
 - [Presentation guide](docs/PresentationGuide.md)
+- [Deployment guide](docs/Deployment.md)
 - [Viva preparation](docs/VivaPreparation.md)
 
 ## Technology

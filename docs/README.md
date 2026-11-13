@@ -12,4 +12,5 @@ This folder is arranged by the question a reader wants answered.
 | What each CSV field means | [DataDictionary.md](DataDictionary.md) |
 | How the code is tested | [TestCases.md](TestCases.md) |
 | How to present the project | [PresentationGuide.md](PresentationGuide.md) |
+| How to put the project online | [Deployment.md](Deployment.md) |
 | How to answer a viva | [VivaPreparation.md](VivaPreparation.md) |

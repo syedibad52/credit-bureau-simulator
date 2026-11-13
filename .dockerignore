@@ -1,0 +1,11 @@
+.git
+.github
+.idea
+.vscode
+target
+output
+*.log
+hs_err_*.log
+replay_*.log
+docs
+test-data
