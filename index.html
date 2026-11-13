@@ -865,6 +865,60 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     .score-tier-tag { animation: none; }
     .score-ruler-fill { transition: none; }
 }
+
+/* Keep every app section inside a phone viewport. The repayment grid is the only horizontal surface. */
+.layout-wrap, .dashboard-grid, .dashboard-grid > div, .panel, .profile-grid, .factors-row,
+.account-card, .account-top, .account-identity, .account-summary, .matrix-legend {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.dashboard-grid > div:last-child { container-type: inline-size; }
+
+.account-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+@container (max-width: 46rem) {
+    .factors-row { grid-template-columns: 1fr; }
+    .factor-tile { min-width: 0; }
+}
+
+@media (max-width: 60rem) {
+    body { padding: var(--space-md); }
+    .app-header { padding: var(--space-md); }
+    .brand-block, .app-header { align-items: flex-start; }
+    .controls-panel { width: 100%; }
+    .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+    .profile-grid { grid-template-columns: minmax(0, 1fr); }
+    .stat-cell, .stat-cell.span-full {
+        grid-column: span 1;
+        padding-inline: 0;
+        border-left: 0;
+    }
+    .stat-cell:nth-child(odd), .stat-cell:nth-child(even) {
+        padding-inline: 0;
+        border-left: 0;
+    }
+    .factors-row { grid-template-columns: minmax(0, 1fr); }
+    .factor-tile { min-height: auto; }
+    .panel-header { align-items: flex-start; }
+    .matrix-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .matrix-legend > span { min-width: 0; white-space: normal; }
+    .account-top { display: grid; grid-template-columns: minmax(0, 1fr); }
+    .account-summary { font-size: 13px; }
+    .account-summary > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+}
+
+@media (max-width: 30rem) {
+    .brand-title-group h1 { font-size: 17px; }
+    .brand-subtitle { align-items: flex-start; flex-direction: column; }
+    .score-board .score-display { font-size: 3.5rem; }
+    .matrix-legend { grid-template-columns: minmax(0, 1fr); }
+}
     </style>
 </head>
 <body>
