@@ -741,14 +741,14 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 .score-board {
     --score-ratio: 0;
     --score-angle: -90deg;
-    --score-dashoffset: 340;
+    --score-dashoffset: 405;
     display: grid;
-    gap: 10px;
-    padding: 20px;
-    border: 1px solid oklch(100% 0 0 / 0.72);
+    gap: 7px;
+    padding: 22px 18px 18px;
+    border: 0;
     border-radius: 18px;
-    background: linear-gradient(135deg, oklch(100% 0 0 / 0.54), oklch(96% 0.024 245 / 0.50)), var(--color-paper-3);
-    box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.78), 0 14px 30px oklch(44% 0.08 245 / 0.09);
+    background: linear-gradient(180deg, oklch(100% 0 0 / 0.46), oklch(96% 0.024 245 / 0.24));
+    box-shadow: none;
     overflow: hidden;
 }
 
@@ -766,14 +766,31 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     font-weight: 650;
 }
 
-.score-board .score-display {
+.score-intro, .score-refresh {
+    text-align: center;
     color: var(--color-ink);
+}
+
+.score-intro {
+    margin-top: 5px;
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.score-intro strong { color: oklch(69% 0.14 85); font-weight: 750; }
+.score-refresh { color: var(--color-muted); font-size: 12px; }
+
+.score-board .score-display {
+    color: transparent;
     font-family: var(--font-body);
-    font-size: clamp(4.6rem, 12vw, 6.5rem);
-    font-weight: 760;
-    letter-spacing: -0.075em;
+    font-size: clamp(5.1rem, 13.5vw, 7rem);
+    font-weight: 800;
+    letter-spacing: -0.09em;
     line-height: 0.8;
-    text-shadow: none;
+    background: linear-gradient(145deg, oklch(43% 0.18 250), oklch(65% 0.15 250));
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 4px 3px oklch(46% 0.10 250 / 0.20));
 }
 
 .score-out-of, .score-scale-hint, .score-gauge-labels, .score-range-note {
@@ -785,8 +802,8 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 .score-gauge {
     position: relative;
     width: min(100%, 320px);
-    height: 192px;
-    margin: 2px auto 0;
+    height: 222px;
+    margin: -2px auto 0;
 }
 
 .score-gauge-svg {
@@ -799,7 +816,7 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 
 .score-gauge-track, .score-gauge-progress {
     fill: none;
-    stroke-width: 15;
+    stroke-width: 16;
     stroke-linecap: round;
 }
 
@@ -807,7 +824,7 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 
 .score-gauge-progress {
     stroke: url(#scoreGradient);
-    stroke-dasharray: 340;
+    stroke-dasharray: 405;
     stroke-dashoffset: var(--score-dashoffset);
     filter: drop-shadow(0 3px 5px oklch(52% 0.12 190 / 0.22));
     transition: stroke-dashoffset 900ms var(--ease-out);
@@ -816,13 +833,13 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 .score-needle {
     position: absolute;
     left: calc(50% - 3px);
-    bottom: 46px;
+    top: 51px;
     width: 6px;
-    height: 104px;
+    height: 128px;
     border-radius: var(--radius-pill);
     background: linear-gradient(to top, oklch(28% 0.02 250), oklch(10% 0.01 250));
     box-shadow: 0 2px 6px oklch(15% 0.02 250 / 0.24);
-    transform-origin: 50% calc(100% - 3px);
+    transform-origin: 50% calc(100% - 1px);
     transform: rotate(var(--score-angle));
     transition: transform 900ms var(--ease-out);
     z-index: 1;
@@ -832,9 +849,9 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     content: '';
     position: absolute;
     left: 50%;
-    bottom: -7px;
-    width: 20px;
-    height: 20px;
+    bottom: -9px;
+    width: 18px;
+    height: 18px;
     border: 4px solid oklch(98% 0.01 245);
     border-radius: 50%;
     background-color: oklch(22% 0.02 250);
@@ -844,11 +861,11 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 
 .score-gauge-content {
     position: absolute;
-    inset: 64px 0 0;
+    inset: 94px 0 0;
     display: grid;
     justify-items: center;
     align-content: start;
-    gap: 9px;
+    gap: 7px;
     z-index: 2;
     pointer-events: none;
 }
@@ -862,12 +879,16 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.01em;
-    background-color: oklch(97% 0.04 150 / 0.72);
+    background-color: transparent;
+    border: 0;
+    color: oklch(49% 0.13 245) !important;
+    font-size: 15px;
+    padding: 0;
     animation: score-tag-in var(--dur-short) var(--ease-out) both;
 }
 
-.score-gauge-labels { padding: 0 14px; font-size: 12px; }
-.score-range-note { font-size: 12px; }
+.score-gauge-labels { padding: 0 13px; font-size: 13px; }
+.score-range-note { color: var(--color-ink); font-size: 14px; font-weight: 550; }
 
 .score-scale-hint::before {
     content: '';
@@ -905,8 +926,9 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 @media (max-width: 760px) {
     .hero-instrument { padding: var(--space-md); }
     .score-board { padding: 18px; }
-    .score-board .score-display { font-size: clamp(4.25rem, 20vw, 5.1rem); }
-    .score-gauge { height: 182px; }
+    .score-board .score-display { font-size: clamp(4.75rem, 22vw, 5.8rem); }
+    .score-gauge { height: 212px; }
+    .score-needle { top: 48px; height: 121px; }
     .matrix-legend {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1077,18 +1099,20 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                             <span class="instrument-title">Credit score</span>
                             <span class="score-scale-hint">Live calculation</span>
                         </div>
+                        <div class="score-intro">Your credit score is <strong id="scoreQuality">being calculated</strong></div>
+                        <div id="scoreRefresh" class="score-refresh">Updated from the selected report date</div>
                         <div class="score-gauge" aria-label="Credit score scale from 300 to 900">
-                            <svg class="score-gauge-svg" viewBox="0 0 320 192" aria-hidden="true">
+                            <svg class="score-gauge-svg" viewBox="0 0 320 222" aria-hidden="true">
                                 <defs>
-                                    <linearGradient id="scoreGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                                        <stop offset="0%" stop-color="#e76f51" />
-                                        <stop offset="35%" stop-color="#f4c95d" />
-                                        <stop offset="64%" stop-color="#75c76b" />
-                                        <stop offset="100%" stop-color="#20a85a" />
+                                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#db654d" />
+                                        <stop offset="30%" stop-color="#f3bd55" />
+                                        <stop offset="55%" stop-color="#d7e868" />
+                                        <stop offset="100%" stop-color="#36ad60" />
                                     </linearGradient>
                                 </defs>
-                                <path class="score-gauge-track" d="M 39 157 A 121 121 0 0 1 281 157" />
-                                <path class="score-gauge-progress" d="M 39 157 A 121 121 0 0 1 281 157" />
+                                <path class="score-gauge-track" d="M 31 180 A 129 129 0 0 1 289 180" />
+                                <path class="score-gauge-progress" d="M 31 180 A 129 129 0 0 1 289 180" />
                             </svg>
                             <span class="score-needle" aria-hidden="true"></span>
                             <div class="score-gauge-content">
@@ -1097,7 +1121,7 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                             </div>
                         </div>
                         <div class="score-gauge-labels" aria-hidden="true">
-                            <span>300</span><span class="score-range-note">Credit score range</span><span>900</span>
+                            <span>300</span><span class="score-range-note">Live score calculation</span><span>900</span>
                         </div>
                     </div>
 
@@ -1318,14 +1342,22 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
             const scoreBoard = document.querySelector('.score-board');
             const scoreVal = document.getElementById('scoreValue');
             const scoreBand = document.getElementById('scoreBand');
+            const scoreQuality = document.getElementById('scoreQuality');
+            const scoreRefresh = document.getElementById('scoreRefresh');
             const overrideBox = document.getElementById('overrideBox');
+
+            const reportDate = data.asOfDate ? new Date(data.asOfDate + 'T00:00:00') : null;
+            scoreRefresh.textContent = reportDate
+                ? 'Calculated for ' + reportDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                : 'Calculated from the selected report date';
 
             if (data.isThinFile) {
                 scoreBoard.style.setProperty('--score-ratio', '0');
                 scoreBoard.style.setProperty('--score-angle', '-90deg');
-                scoreBoard.style.setProperty('--score-dashoffset', '340');
+                scoreBoard.style.setProperty('--score-dashoffset', '405');
                 scoreVal.textContent = 'NA';
                 scoreBand.textContent = 'Thin File';
+                scoreQuality.textContent = 'not available';
                 scoreBand.style.borderColor = 'var(--signal-rose)';
                 scoreBand.style.color = 'var(--signal-rose)';
 
@@ -1335,27 +1367,32 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                 const ratio = Math.max(0, Math.min(1, (data.finalScore - 300) / 600));
                 scoreBoard.style.setProperty('--score-ratio', ratio.toFixed(3));
                 scoreBoard.style.setProperty('--score-angle', (-90 + ratio * 180).toFixed(1) + 'deg');
-                scoreBoard.style.setProperty('--score-dashoffset', (340 * (1 - ratio)).toFixed(1));
+                scoreBoard.style.setProperty('--score-dashoffset', (405 * (1 - ratio)).toFixed(1));
 
                 animateCounter(scoreVal, data.finalScore);
 
                 if (data.finalScore >= 800) {
+                    scoreQuality.textContent = 'excellent';
                     scoreBand.textContent = 'Super-Prime';
                     scoreBand.style.borderColor = 'var(--signal-lime)';
                     scoreBand.style.color = 'var(--signal-lime)';
                 } else if (data.finalScore >= 720) {
+                    scoreQuality.textContent = 'very good';
                     scoreBand.textContent = 'Prime';
                     scoreBand.style.borderColor = 'var(--signal-cyan)';
                     scoreBand.style.color = 'var(--signal-cyan)';
                 } else if (data.finalScore >= 650) {
+                    scoreQuality.textContent = 'good';
                     scoreBand.textContent = 'Good / Near Prime';
                     scoreBand.style.borderColor = 'var(--signal-blue)';
                     scoreBand.style.color = 'var(--signal-blue)';
                 } else if (data.finalScore >= 550) {
+                    scoreQuality.textContent = 'fair';
                     scoreBand.textContent = 'Moderate Risk';
                     scoreBand.style.borderColor = 'var(--signal-amber)';
                     scoreBand.style.color = 'var(--signal-amber)';
                 } else {
+                    scoreQuality.textContent = 'needs attention';
                     scoreBand.textContent = 'High Risk';
                     scoreBand.style.borderColor = 'var(--signal-rose)';
                     scoreBand.style.color = 'var(--signal-rose)';
