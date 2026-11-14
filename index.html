@@ -735,13 +735,15 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 @keyframes surface-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes drift-one { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-5rem, 4rem, 0) scale(1.12); } }
 @keyframes drift-two { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(6rem, -3rem, 0) scale(1.14); } }
-@media (prefers-reduced-motion: reduce) { .app-header, .scenarios-tray, .panel, .factors-row, .dashboard-grid > div > .panel, body::before, body::after, .score-scale-hint::before { animation: none; } .score-gauge-progress, .score-needle { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .app-header, .scenarios-tray, .panel, .factors-row, .dashboard-grid > div > .panel, body::before, body::after, .score-scale-hint::before { animation: none; } .score-gauge-progress, .score-marker { transition: none; } }
 
 /* Curved credit-score gauge and mobile repayment layout. */
 .score-board {
     --score-ratio: 0;
     --score-angle: -90deg;
     --score-dashoffset: 405;
+    --score-marker-x: 31px;
+    --score-marker-y: 180px;
     display: grid;
     gap: 7px;
     padding: 22px 18px 18px;
@@ -781,19 +783,16 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 .score-refresh { color: var(--color-muted); font-size: 12px; }
 
 .score-board .score-display {
-    color: transparent;
+    color: oklch(62% 0.15 245);
     font-family: var(--font-body);
-    font-size: clamp(5.1rem, 13.5vw, 7rem);
+    font-size: clamp(4.35rem, 11vw, 5.7rem);
     font-weight: 800;
     letter-spacing: -0.09em;
     line-height: 0.8;
-    background: linear-gradient(145deg, oklch(43% 0.18 250), oklch(65% 0.15 250));
-    -webkit-background-clip: text;
-    background-clip: text;
-    filter: drop-shadow(0 4px 3px oklch(46% 0.10 250 / 0.20));
+    text-shadow: 0 2px 10px oklch(63% 0.12 245 / 0.18);
 }
 
-.score-out-of, .score-scale-hint, .score-gauge-labels, .score-range-note {
+.score-scale-hint, .score-gauge-labels, .score-range-note {
     color: var(--color-muted);
     font-family: var(--font-body);
     font-size: 13px;
@@ -830,47 +829,31 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     transition: stroke-dashoffset 900ms var(--ease-out);
 }
 
-.score-needle {
+.score-marker {
     position: absolute;
-    left: calc(50% - 3px);
-    top: 51px;
-    width: 6px;
-    height: 128px;
-    border-radius: var(--radius-pill);
-    background: linear-gradient(to top, oklch(28% 0.02 250), oklch(10% 0.01 250));
-    box-shadow: 0 2px 6px oklch(15% 0.02 250 / 0.24);
-    transform-origin: 50% calc(100% - 1px);
-    transform: rotate(var(--score-angle));
-    transition: transform 900ms var(--ease-out);
-    z-index: 1;
-}
-
-.score-needle::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -9px;
-    width: 18px;
-    height: 18px;
-    border: 4px solid oklch(98% 0.01 245);
+    left: var(--score-marker-x);
+    top: var(--score-marker-y);
+    width: 17px;
+    height: 17px;
+    border: 4px solid oklch(99% 0.01 245);
     border-radius: 50%;
-    background-color: oklch(22% 0.02 250);
-    box-shadow: 0 2px 8px oklch(25% 0.04 245 / 0.22);
-    transform: translateX(-50%);
+    background-color: oklch(24% 0.02 250);
+    box-shadow: 0 2px 8px oklch(25% 0.04 245 / 0.26);
+    transform: translate(-50%, -50%);
+    transition: left 900ms var(--ease-out), top 900ms var(--ease-out);
+    z-index: 3;
 }
 
 .score-gauge-content {
     position: absolute;
-    inset: 94px 0 0;
+    inset: 103px 0 0;
     display: grid;
     justify-items: center;
     align-content: start;
-    gap: 7px;
+    gap: 10px;
     z-index: 2;
     pointer-events: none;
 }
-
-.score-gauge-content .score-out-of { margin-left: 4px; }
 
 .score-tier-tag {
     margin: 0;
@@ -880,9 +863,9 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     font-weight: 700;
     letter-spacing: 0.01em;
     background-color: transparent;
-    border: 0;
-    color: oklch(49% 0.13 245) !important;
-    font-size: 15px;
+    border: 0 !important;
+    color: oklch(50% 0.12 245) !important;
+    font-size: 14px;
     padding: 0;
     animation: score-tag-in var(--dur-short) var(--ease-out) both;
 }
@@ -926,9 +909,8 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 @media (max-width: 760px) {
     .hero-instrument { padding: var(--space-md); }
     .score-board { padding: 18px; }
-    .score-board .score-display { font-size: clamp(4.75rem, 22vw, 5.8rem); }
+    .score-board .score-display { font-size: clamp(4.25rem, 20vw, 5.15rem); }
     .score-gauge { height: 212px; }
-    .score-needle { top: 48px; height: 121px; }
     .matrix-legend {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -950,7 +932,7 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 
 @media (prefers-reduced-motion: reduce) {
     .score-tier-tag { animation: none; }
-    .score-gauge-progress, .score-needle { transition: none; }
+    .score-gauge-progress, .score-marker { transition: none; }
 }
 
 /* Keep every app section inside a phone viewport. The repayment grid is the only horizontal surface. */
@@ -1114,9 +1096,9 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                                 <path class="score-gauge-track" d="M 31 180 A 129 129 0 0 1 289 180" />
                                 <path class="score-gauge-progress" d="M 31 180 A 129 129 0 0 1 289 180" />
                             </svg>
-                            <span class="score-needle" aria-hidden="true"></span>
+                            <span class="score-marker" aria-hidden="true"></span>
                             <div class="score-gauge-content">
-                                <div><span id="scoreValue" class="score-display">---</span><span class="score-out-of"> / 900</span></div>
+                                <div><span id="scoreValue" class="score-display">---</span></div>
                                 <div id="scoreBand" class="score-tier-tag">Evaluating</div>
                             </div>
                         </div>
@@ -1355,6 +1337,8 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                 scoreBoard.style.setProperty('--score-ratio', '0');
                 scoreBoard.style.setProperty('--score-angle', '-90deg');
                 scoreBoard.style.setProperty('--score-dashoffset', '405');
+                scoreBoard.style.setProperty('--score-marker-x', '31px');
+                scoreBoard.style.setProperty('--score-marker-y', '180px');
                 scoreVal.textContent = 'NA';
                 scoreBand.textContent = 'Thin File';
                 scoreQuality.textContent = 'not available';
@@ -1368,6 +1352,9 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                 scoreBoard.style.setProperty('--score-ratio', ratio.toFixed(3));
                 scoreBoard.style.setProperty('--score-angle', (-90 + ratio * 180).toFixed(1) + 'deg');
                 scoreBoard.style.setProperty('--score-dashoffset', (405 * (1 - ratio)).toFixed(1));
+                const arcAngle = Math.PI * (1 - ratio);
+                scoreBoard.style.setProperty('--score-marker-x', (160 + 129 * Math.cos(arcAngle)).toFixed(1) + 'px');
+                scoreBoard.style.setProperty('--score-marker-y', (180 - 129 * Math.sin(arcAngle)).toFixed(1) + 'px');
 
                 animateCounter(scoreVal, data.finalScore);
 
