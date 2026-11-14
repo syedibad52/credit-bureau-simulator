@@ -1224,21 +1224,46 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
             loadReport();
         }
 
+        const DEPLOYED_BACKEND_URL = 'https://credit-bureau-simulator-1.onrender.com';
+
+        async function getReportData(path) {
+            const isLocalFile = window.location.protocol === 'file:';
+            const primaryOrigin = isLocalFile ? 'http://localhost:8080' : '';
+            const requestOrigins = [primaryOrigin];
+
+            // Vercel normally proxies /api requests. If its BACKEND_URL variable is
+            // missing or unavailable, use the Render API directly instead.
+            if (!isLocalFile && window.location.origin !== DEPLOYED_BACKEND_URL) {
+                requestOrigins.push(DEPLOYED_BACKEND_URL);
+            }
+
+            let lastError;
+            for (const origin of requestOrigins) {
+                try {
+                    const response = await fetch(origin + path, {
+                        headers: { accept: 'application/json' }
+                    });
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return await response.json();
+                } catch (error) {
+                    lastError = error;
+                }
+            }
+            throw lastError || new Error('The scoring API is unavailable.');
+        }
+
         async function loadReport() {
             const consumer = document.getElementById('consumerSelect').value;
             const asOf = document.getElementById('asOfDate').value;
-            const apiOrigin = window.location.protocol === 'file:' ? 'http://localhost:8080' : '';
 
             try {
-                const res = await fetch(apiOrigin + '/api/report?consumer=' + encodeURIComponent(consumer) + '&asOf=' + encodeURIComponent(asOf));
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
+                const data = await getReportData('/api/report?consumer=' + encodeURIComponent(consumer) + '&asOf=' + encodeURIComponent(asOf));
                 renderReport(data);
             } catch (err) {
                 console.error('Failed to load report', err);
                 document.getElementById('scoreBand').textContent = 'Unable to load';
-                document.getElementById('accountsContainer').textContent = 'Could not load report data. Start the simulator server on localhost:8080, then try again.';
-                document.getElementById('rulesList').textContent = 'Report data is unavailable.';
+                document.getElementById('accountsContainer').textContent = 'Could not load report data. Please refresh once, then try Evaluate Score again.';
+                document.getElementById('rulesList').textContent = 'Report data is temporarily unavailable.';
             }
         }
 
