@@ -735,14 +735,15 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 @keyframes surface-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes drift-one { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-5rem, 4rem, 0) scale(1.12); } }
 @keyframes drift-two { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(6rem, -3rem, 0) scale(1.14); } }
-@media (prefers-reduced-motion: reduce) { .app-header, .scenarios-tray, .panel, .factors-row, .dashboard-grid > div > .panel, body::before, body::after, .score-ruler-marker, .score-scale-hint::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .app-header, .scenarios-tray, .panel, .factors-row, .dashboard-grid > div > .panel, body::before, body::after, .score-scale-hint::before { animation: none; } .score-gauge-progress, .score-needle { transition: none; } }
 
-/* Credit-score card and mobile repayment layout. */
+/* Curved credit-score gauge and mobile repayment layout. */
 .score-board {
     --score-ratio: 0;
-    --score-percent: 0%;
+    --score-angle: -90deg;
+    --score-dashoffset: 340;
     display: grid;
-    gap: 14px;
+    gap: 10px;
     padding: 20px;
     border: 1px solid oklch(100% 0 0 / 0.72);
     border-radius: 18px;
@@ -751,7 +752,7 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     overflow: hidden;
 }
 
-.score-board-head, .score-reading-row, .score-ruler-labels {
+.score-board-head, .score-gauge-labels, .score-status-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -765,26 +766,96 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     font-weight: 650;
 }
 
-.score-reading-row { align-items: flex-end; }
-
 .score-board .score-display {
     color: var(--color-ink);
     font-family: var(--font-body);
-    font-size: clamp(4.8rem, 13vw, 6.9rem);
+    font-size: clamp(4.6rem, 12vw, 6.5rem);
     font-weight: 760;
     letter-spacing: -0.075em;
     line-height: 0.8;
     text-shadow: none;
 }
 
-.score-out-of, .score-scale-hint, .score-ruler-labels {
+.score-out-of, .score-scale-hint, .score-gauge-labels, .score-range-note {
     color: var(--color-muted);
     font-family: var(--font-body);
     font-size: 13px;
 }
 
+.score-gauge {
+    position: relative;
+    width: min(100%, 320px);
+    height: 192px;
+    margin: 2px auto 0;
+}
+
+.score-gauge-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.score-gauge-track, .score-gauge-progress {
+    fill: none;
+    stroke-width: 15;
+    stroke-linecap: round;
+}
+
+.score-gauge-track { stroke: oklch(88% 0.02 245 / 0.70); }
+
+.score-gauge-progress {
+    stroke: url(#scoreGradient);
+    stroke-dasharray: 340;
+    stroke-dashoffset: var(--score-dashoffset);
+    filter: drop-shadow(0 3px 5px oklch(52% 0.12 190 / 0.22));
+    transition: stroke-dashoffset 900ms var(--ease-out);
+}
+
+.score-needle {
+    position: absolute;
+    left: calc(50% - 3px);
+    bottom: 46px;
+    width: 6px;
+    height: 104px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(to top, oklch(28% 0.02 250), oklch(10% 0.01 250));
+    box-shadow: 0 2px 6px oklch(15% 0.02 250 / 0.24);
+    transform-origin: 50% calc(100% - 3px);
+    transform: rotate(var(--score-angle));
+    transition: transform 900ms var(--ease-out);
+    z-index: 1;
+}
+
+.score-needle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    width: 20px;
+    height: 20px;
+    border: 4px solid oklch(98% 0.01 245);
+    border-radius: 50%;
+    background-color: oklch(22% 0.02 250);
+    box-shadow: 0 2px 8px oklch(25% 0.04 245 / 0.22);
+    transform: translateX(-50%);
+}
+
+.score-gauge-content {
+    position: absolute;
+    inset: 64px 0 0;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 9px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.score-gauge-content .score-out-of { margin-left: 4px; }
+
 .score-tier-tag {
-    justify-self: start;
     margin: 0;
     padding: 5px 12px;
     border-radius: var(--radius-pill);
@@ -795,41 +866,8 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
     animation: score-tag-in var(--dur-short) var(--ease-out) both;
 }
 
-.score-ruler {
-    position: relative;
-    height: 11px;
-    margin-top: 4px;
-    border-radius: var(--radius-pill);
-    background-color: oklch(86% 0.025 245 / 0.72);
-    overflow: visible;
-}
-
-.score-ruler-fill {
-    position: absolute;
-    inset: 0;
-    transform: scaleX(var(--score-ratio));
-    transform-origin: left center;
-    border-radius: inherit;
-    background: linear-gradient(90deg, oklch(61% 0.16 235), oklch(58% 0.16 220));
-    box-shadow: 0 2px 6px oklch(51% 0.14 230 / 0.24);
-    transition: transform 900ms var(--ease-out);
-}
-
-.score-ruler-marker {
-    position: absolute;
-    top: 50%;
-    left: var(--score-percent);
-    width: 20px;
-    height: 20px;
-    border: 4px solid oklch(88% 0.025 245 / 0.95);
-    border-radius: 50%;
-    background-color: oklch(58% 0.16 220);
-    box-shadow: 0 3px 10px oklch(48% 0.12 240 / 0.30), 0 0 0 3px oklch(61% 0.15 230 / 0.14);
-    transform: translate(-50%, -50%);
-    animation: score-marker-settle 1.4s var(--ease-out) both;
-}
-
-.score-ruler-labels { padding-inline: 1px; font-size: 12px; }
+.score-gauge-labels { padding: 0 14px; font-size: 12px; }
+.score-range-note { font-size: 12px; }
 
 .score-scale-hint::before {
     content: '';
@@ -846,11 +884,6 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 
 @keyframes score-live-pulse {
     50% { opacity: .55; box-shadow: 0 0 0 7px oklch(72% 0.16 145 / 0); }
-}
-
-@keyframes score-marker-settle {
-    from { opacity: 0; transform: translate(-50%, -50%) scale(.55); }
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 .timeline-scroll {
@@ -872,8 +905,8 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 @media (max-width: 760px) {
     .hero-instrument { padding: var(--space-md); }
     .score-board { padding: 18px; }
-    .score-board .score-display { font-size: clamp(4.5rem, 21vw, 5.25rem); }
-    .score-ruler { height: 10px; }
+    .score-board .score-display { font-size: clamp(4.25rem, 20vw, 5.1rem); }
+    .score-gauge { height: 182px; }
     .matrix-legend {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -895,7 +928,7 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 
 @media (prefers-reduced-motion: reduce) {
     .score-tier-tag { animation: none; }
-    .score-ruler-fill { transition: none; }
+    .score-gauge-progress, .score-needle { transition: none; }
 }
 
 /* Keep every app section inside a phone viewport. The repayment grid is the only horizontal surface. */
@@ -1044,16 +1077,28 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
                             <span class="instrument-title">Credit score</span>
                             <span class="score-scale-hint">Live calculation</span>
                         </div>
-                        <div class="score-reading-row">
-                            <div id="scoreValue" class="score-display">---</div>
-                            <span class="score-out-of">/ 900</span>
+                        <div class="score-gauge" aria-label="Credit score scale from 300 to 900">
+                            <svg class="score-gauge-svg" viewBox="0 0 320 192" aria-hidden="true">
+                                <defs>
+                                    <linearGradient id="scoreGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#e76f51" />
+                                        <stop offset="35%" stop-color="#f4c95d" />
+                                        <stop offset="64%" stop-color="#75c76b" />
+                                        <stop offset="100%" stop-color="#20a85a" />
+                                    </linearGradient>
+                                </defs>
+                                <path class="score-gauge-track" d="M 39 157 A 121 121 0 0 1 281 157" />
+                                <path class="score-gauge-progress" d="M 39 157 A 121 121 0 0 1 281 157" />
+                            </svg>
+                            <span class="score-needle" aria-hidden="true"></span>
+                            <div class="score-gauge-content">
+                                <div><span id="scoreValue" class="score-display">---</span><span class="score-out-of"> / 900</span></div>
+                                <div id="scoreBand" class="score-tier-tag">Evaluating</div>
+                            </div>
                         </div>
-                        <div id="scoreBand" class="score-tier-tag">Evaluating</div>
-                        <div class="score-ruler" aria-label="Credit score scale from 300 to 900">
-                            <span class="score-ruler-fill"></span>
-                            <span class="score-ruler-marker" aria-hidden="true"></span>
+                        <div class="score-gauge-labels" aria-hidden="true">
+                            <span>300</span><span class="score-range-note">Credit score range</span><span>900</span>
                         </div>
-                        <div class="score-ruler-labels" aria-hidden="true"><span>300</span><span>600</span><span>900</span></div>
                     </div>
 
                     <div id="overrideBox" class="override-alert" style="display:none;"></div>
@@ -1277,7 +1322,8 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
 
             if (data.isThinFile) {
                 scoreBoard.style.setProperty('--score-ratio', '0');
-                scoreBoard.style.setProperty('--score-percent', '0%');
+                scoreBoard.style.setProperty('--score-angle', '-90deg');
+                scoreBoard.style.setProperty('--score-dashoffset', '340');
                 scoreVal.textContent = 'NA';
                 scoreBand.textContent = 'Thin File';
                 scoreBand.style.borderColor = 'var(--signal-rose)';
@@ -1288,7 +1334,8 @@ body::after { bottom: -18rem; left: -12rem; background-color: var(--wash-amber);
             } else {
                 const ratio = Math.max(0, Math.min(1, (data.finalScore - 300) / 600));
                 scoreBoard.style.setProperty('--score-ratio', ratio.toFixed(3));
-                scoreBoard.style.setProperty('--score-percent', (ratio * 100).toFixed(1) + '%');
+                scoreBoard.style.setProperty('--score-angle', (-90 + ratio * 180).toFixed(1) + 'deg');
+                scoreBoard.style.setProperty('--score-dashoffset', (340 * (1 - ratio)).toFixed(1));
 
                 animateCounter(scoreVal, data.finalScore);
 
